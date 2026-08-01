@@ -21,24 +21,41 @@ import "./brand.js";
 
 import { onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
 import { Tandem } from "scenerystack/tandem";
+import { CaliperScreen } from "./caliper/CaliperScreen.js";
 import { StringManager } from "./i18n/StringManager.js";
-import { SimPreferencesModel } from "./preferences/SimPreferencesModel.js";
-import { SimPreferencesNode } from "./preferences/SimPreferencesNode.js";
-import SimColors from "./SimColors.js";
-import { SimScreen } from "./sim-screen/SimScreen.js";
+import { InstrumentsScreen } from "./instruments/InstrumentsScreen.js";
+import { PracticeScreen } from "./practice/PracticeScreen.js";
+import { VernierScalesPreferencesModel } from "./preferences/VernierScalesPreferencesModel.js";
+import { VernierScalesPreferencesNode } from "./preferences/VernierScalesPreferencesNode.js";
+import { VernierPrincipleScreen } from "./principle/VernierPrincipleScreen.js";
+import VernierScalesColors from "./VernierScalesColors.js";
 
 onReadyToLaunch(() => {
   const stringManager = StringManager.getInstance();
 
-  // Simulation-specific preferences; initial values come from simQueryParameters.
-  const simPreferences = new SimPreferencesModel(Tandem.ROOT.createTandem("preferences"));
+  // Simulation-specific preferences; initial values come from vernierScalesQueryParameters.
+  const simPreferences = new VernierScalesPreferencesModel(Tandem.ROOT.createTandem("preferences"));
 
   const screens = [
-    new SimScreen({
-      // The screen name Property updates automatically when the locale changes
-      name: stringManager.getScreenNames().simStringProperty,
-      tandem: Tandem.ROOT.createTandem("simScreen"),
-      backgroundColorProperty: SimColors.backgroundColorProperty,
+    new VernierPrincipleScreen({
+      name: stringManager.getScreenNames().principleStringProperty,
+      tandem: Tandem.ROOT.createTandem("principleScreen"),
+      backgroundColorProperty: VernierScalesColors.backgroundColorProperty,
+    }),
+    new CaliperScreen({
+      name: stringManager.getScreenNames().caliperStringProperty,
+      tandem: Tandem.ROOT.createTandem("caliperScreen"),
+      backgroundColorProperty: VernierScalesColors.backgroundColorProperty,
+    }),
+    new InstrumentsScreen({
+      name: stringManager.getScreenNames().instrumentsStringProperty,
+      tandem: Tandem.ROOT.createTandem("instrumentsScreen"),
+      backgroundColorProperty: VernierScalesColors.backgroundColorProperty,
+    }),
+    new PracticeScreen({
+      name: stringManager.getScreenNames().practiceStringProperty,
+      tandem: Tandem.ROOT.createTandem("practiceScreen"),
+      backgroundColorProperty: VernierScalesColors.backgroundColorProperty,
     }),
   ];
 
@@ -53,7 +70,7 @@ onReadyToLaunch(() => {
       simulationOptions: {
         customPreferences: [
           {
-            createContent: (tandem: Tandem) => new SimPreferencesNode(simPreferences, tandem),
+            createContent: (tandem: Tandem) => new VernierScalesPreferencesNode(simPreferences, tandem),
           },
         ],
       },

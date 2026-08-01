@@ -77,28 +77,37 @@ export class StringManager {
    * Each property updates automatically when the locale changes.
    */
   public getScreenNames(): {
-    readonly simStringProperty: ReadOnlyProperty<string>;
+    readonly principleStringProperty: ReadOnlyProperty<string>;
+    readonly caliperStringProperty: ReadOnlyProperty<string>;
+    readonly instrumentsStringProperty: ReadOnlyProperty<string>;
+    readonly practiceStringProperty: ReadOnlyProperty<string>;
   } {
     return {
-      simStringProperty: stringProperties.screens.simStringProperty,
+      principleStringProperty: stringProperties.screens.principleStringProperty,
+      caliperStringProperty: stringProperties.screens.caliperStringProperty,
+      instrumentsStringProperty: stringProperties.screens.instrumentsStringProperty,
+      practiceStringProperty: stringProperties.screens.practiceStringProperty,
     };
   }
 
-  /**
-   * Accessibility (Interactive Description) StringProperties.
-   *
-   * Returns the reactive `a11y` string tree used by the parallel DOM:
-   *   - `screenSummary.*` — play-area / control-area overview and an interaction
-   *     hint, read by `SimScreenSummaryContent`.
-   *   - `currentDetails` — a paragraph describing the simulation's current state.
-   *     In a real sim, derive a live version from model Properties (see
-   *     LunarLander's ScreenSummaryContent for the canonical pattern).
-   *
-   * Add `accessibleName` / `accessibleHelpText` strings for individual controls
-   * to the `a11y` group too, then read them through this same nested tree.
-   */
-  public getA11yStrings() {
-    return stringProperties.a11y;
+  /** Accessibility strings for the Vernier Principle screen. */
+  public getVernierPrincipleA11yStrings() {
+    return stringProperties.a11y.principle;
+  }
+
+  /** Accessibility strings for the Caliper screen. */
+  public getCaliperA11yStrings() {
+    return stringProperties.a11y.caliper;
+  }
+
+  /** Accessibility strings for the Instruments screen. */
+  public getInstrumentsA11yStrings() {
+    return stringProperties.a11y.instruments;
+  }
+
+  /** Accessibility strings for the Practice screen. */
+  public getPracticeA11yStrings() {
+    return stringProperties.a11y.practice;
   }
 
   /**
