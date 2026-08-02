@@ -75,8 +75,6 @@ and is fully unit-tested.
   switching is automatic.
 - `VernierScalesButtonOptions` / `VERNIER_SCALES_COMBO_BOX_OPTIONS` — flat button and
   combo-box option bundles (see `CLAUDE.md`).
-- `TimeModel` — present from the template; this sim does not animate over time, so
-  screens do not compose it.
 
 ## View pitfalls specific to this sim
 
