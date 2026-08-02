@@ -137,10 +137,18 @@ export type VernierScaleNodeOptions = SelfOptions & NodeOptions;
  * Finest rather than coarsest — a 10-division vernier wants all ten numbered,
  * and taking the coarsest divisor would label only 0 and 10, which is no use for
  * reading anything. A 50-division vernier falls through to every fifth.
+ *
+ * A count with no nice divisor in range — a prime such as 13, 17 or 23 — used to
+ * collapse to every tenth, which numbered only 0, 10 and the final tick and left
+ * the rest of the scale anonymous. Stepping by `ceil(n / 12)` instead keeps
+ * roughly a dozen regularly spaced numbers on the scale even when the step does
+ * not divide `n`, at the cost of an irregular gap before the final tick (which
+ * the caller always labels via its `index === divisions` case).
  */
 const vernierLabelInterval = (n: number): number => {
   const candidates = [1, 2, 5, 10];
-  return candidates.find((interval) => n % interval === 0 && n / interval <= 12) ?? 10;
+  const nice = candidates.find((interval) => n % interval === 0 && n / interval <= 12);
+  return nice ?? Math.ceil(n / 12);
 };
 
 /**
