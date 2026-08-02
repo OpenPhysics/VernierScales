@@ -73,35 +73,35 @@ const VernierScalesColors = {
   }),
 
   // ── Instrument scales ────────────────────────────────────────────────────────
-  // A real caliper is read as dark marks on bright steel, and that contrast is
-  // what makes coincidence judgeable. The scale face therefore stays light in
-  // both profiles, with dark ticks, rather than inverting with the theme.
+  // The scale face follows the colour profile — dark in default mode, light in
+  // projector mode — and its marks are the inverse shade, so coincidence stays
+  // judgeable whatever the theme. The properties below pair each face with its
+  // marks; do not substitute the sim's general text colour.
 
-  /** Face of a scale — the brushed-steel background the marks are engraved into. */
+  /** Face of a scale — the surface the marks are engraved into. Dark in default mode, light in projector mode. */
   scaleFaceColorProperty: new ProfileColorProperty(VernierScalesNamespace, "scaleFace", {
-    default: "#e8eaed",
+    default: "#0c0c18",
     projector: "#fafafa",
   }),
 
   /**
-   * Numbers printed on a scale face. Dark in both profiles, like the ticks: the
-   * face stays light whatever the theme, so the sim's general text colour —
-   * near-white in default mode — would be all but invisible on it.
+   * Numbers printed on a scale face. They invert with the face: light on the
+   * dark default face, dark on the light projector face, mirroring the ticks.
    */
   scaleLabelColorProperty: new ProfileColorProperty(VernierScalesNamespace, "scaleLabel", {
-    default: "#20242c",
+    default: "#e8eaed",
     projector: "#20242c",
   }),
 
-  /** Main-scale tick marks. */
+  /** Main-scale tick marks — light on the dark default face, dark on projector. */
   scaleTickColorProperty: new ProfileColorProperty(VernierScalesNamespace, "scaleTick", {
-    default: "#20242c",
+    default: "#e8eaed",
     projector: "#20242c",
   }),
 
   /** Vernier-scale tick marks, distinguished from the main scale by hue. */
   vernierTickColorProperty: new ProfileColorProperty(VernierScalesNamespace, "vernierTick", {
-    default: "#1c4f8b",
+    default: "#64b5f6",
     projector: "#1c4f8b",
   }),
 

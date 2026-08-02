@@ -78,9 +78,10 @@ and is fully unit-tested.
 
 ## View pitfalls specific to this sim
 
-- **Scale faces stay light in both colour profiles** (`scaleFaceColorProperty`,
-  `scaleTickColorProperty`, `scaleLabelColorProperty`). Using the general
-  `textColorProperty` on a scale face makes ticks near-invisible in default mode.
+- **Scale faces follow the colour profile** — dark in default mode, light in
+  projector, with ticks in the inverse shade (`scaleFaceColorProperty`,
+  `scaleTickColorProperty`, `scaleLabelColorProperty`). Use these dedicated
+  properties so marks track the face; the general `textColorProperty` does not.
 - **Never pass `visible: false` alongside a `visibleProperty`.** Scenery applies
   `visible` after `visibleProperty` and writes it through, silently setting the
   caller's Property to false. Use a constant `new BooleanProperty(false)` instead.
