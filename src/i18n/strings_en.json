@@ -77,21 +77,27 @@
     "protractorNote": "Twelve vernier divisions span 23 degrees, so the least count is five arcminutes."
   },
   "practice": {
-    "level": "Question type",
+    "chooseYourLevel": "Choose Your Level",
     "levels": {
       "metric": "Metric",
       "imperial": "Imperial",
       "zeroError": "With zero error"
     },
+    "levelDescriptions": {
+      "metric": "0.1, 0.05 and 0.02 mm calipers",
+      "imperial": "Thousandths and 1/128 in",
+      "zeroError": "Calipers that do not read zero"
+    },
     "prompt": "What does the instrument read?",
     "yourAnswer": "Your answer",
     "check": "Check",
-    "newQuestion": "New question",
+    "tryAgain": "Try Again",
+    "showAnswer": "Show Answer",
+    "next": "Next",
     "correct": "Correct.",
     "incorrect": "Not quite — look again at which line coincides.",
     "unparseable": "That is not a reading this instrument can give.",
     "revealPattern": "The reading is {{reading}}.",
-    "tallyPattern": "{{correct}} correct of {{asked}}",
     "fractionHint": "Write fractions like 1 37/128.",
     "zeroErrorPrompt": "Zero error: {{value}}. Correct for it, then type the true measurement."
   },
@@ -99,7 +105,8 @@
     "principle": {
       "screenSummary": {
         "playArea": "A main scale runs across the play area with a vernier scale sliding beneath it. A magnified view below shows the region around the line where the two scales coincide.",
-        "controlArea": "The control area sets how many divisions the vernier has and which of the three vernier geometries it uses, and has a Reset All button.",
+        "controlArea": "The control area sets how many divisions the vernier has and has a Reset All button.",
+        "controlAreaWithGeometry": "The control area sets how many divisions the vernier has and which of the three vernier geometries it uses, and has a Reset All button.",
         "interactionHint": "Move the vernier along the main scale and watch which vernier line comes into alignment."
       },
       "currentDetails": "The vernier has {{divisions}} divisions, so one least count is {{leastCount}}. The vernier zero sits past {{main}}, vernier line {{index}} coincides, and the reading is {{reading}}.",
@@ -145,22 +152,32 @@
     },
     "practice": {
       "screenSummary": {
-        "playArea": "An instrument is set to a value for you to read, shown full width with a magnified view of the coinciding line beneath it.",
-        "controlArea": "The control area has a field for your answer, a Check button, a New question button, a question type selector, and a Reset All button.",
-        "interactionHint": "Read the instrument, type what it says, and check your answer."
+        "playArea": "A game of five challenges. An instrument is set to a value for you to read, shown full width with a magnified view of the coinciding line beneath it.",
+        "controlArea": "The control area has a field for your answer, buttons to check it and to move on, a status bar showing the level, challenge number and score, and a Reset All button.",
+        "interactionHint": "Choose a level, read the instrument, type what it says, and check your answer."
       },
-      "currentDetails": "Question {{asked}} on the {{scale}} scale. {{tally}}.",
+      "currentDetails": {
+        "levelSelection": "Choosing a level. Three levels are available: Metric, Imperial, and With zero error.",
+        "challenge": "Level {{level}}, challenge {{challenge}} of {{total}}, on the {{scale}} scale. Score {{score}} of {{perfect}}.",
+        "levelCompleted": "Level {{level}} complete, with a score of {{score}} of {{perfect}}."
+      },
       "controls": {
         "answer": "Your answer",
         "answerHelp": "Type the reading, then activate the Check button.",
         "check": "Check the answer",
-        "newQuestion": "Ask a new question",
-        "level": "Question type"
+        "tryAgain": "Try this reading again",
+        "showAnswer": "Show the reading",
+        "next": "Go to the next challenge",
+        "levelButtonPattern": "Level {{number}}, {{name}}",
+        "levelButtonHelp": "Start this level: five instruments to read."
       },
       "responses": {
-        "correct": "Correct. The reading is {{reading}}.",
+        "correct": "Correct. The reading is {{reading}}. Your score is now {{score}}.",
         "incorrect": "Not correct. Look again at which vernier line coincides.",
-        "unparseable": "That is not a reading this instrument can give."
+        "unparseable": "That is not a reading this instrument can give.",
+        "revealed": "The reading is {{reading}}.",
+        "levelStarted": "Level {{level}} started. Challenge 1 of {{total}}.",
+        "levelCompleted": "Level complete. You scored {{score}} of {{perfect}}."
       }
     }
   },
@@ -168,7 +185,8 @@
     "title": "Simulation",
     "startMagnified": "Start with the magnified view shown",
     "showTrueValue": "Show the true value",
-    "showCoincidenceMarker": "Mark the coincident line"
+    "showCoincidenceMarker": "Mark the coincident line",
+    "showVernierGeometry": "Show vernier geometry choices"
   },
   "keyboardHelp": {
     "title": "Move the Vernier",

@@ -14,8 +14,10 @@
  * a screen reader that announces the field as a text box the user can type in,
  * because it genuinely is one.
  *
- * The visible rectangle and text are decoration painted to match; the input
- * element itself is positioned over them by scenery's PDOM layer.
+ * The visible rectangle and text are decoration painted to match. The PDOM input
+ * itself sits off-canvas with `pointer-events: none` (scenery's default for the
+ * accessibility layer), so a pointer down on the painted field has to call
+ * {@link Node.focus} before keystrokes can reach it.
  */
 
 import { DerivedProperty, type StringProperty, type TReadOnlyProperty } from "scenerystack/axon";
@@ -47,6 +49,7 @@ export class AnswerFieldNode extends Node {
         tagName: "input",
         inputType: "text",
         focusable: true,
+        cursor: "text",
       },
       providedOptions,
     );
@@ -82,12 +85,21 @@ export class AnswerFieldNode extends Node {
       );
     }
 
-    // DOM → model. `inputValue` is typed loosely because the PDOM also uses it
-    // for numbers and for translated strings, so it is narrowed here.
+    // Pointer hits land on the canvas decoration, not the PDOM input. Focus the
+    // input so the next keystrokes are typed into it.
     this.addInputListener({
-      input: () => {
-        const value = this.inputValue;
-        answerTextProperty.value = typeof value === "string" ? value : String(value ?? "");
+      down: () => {
+        this.focus();
+      },
+    });
+
+    // DOM → model. Read the live element value — `this.inputValue` is scenery
+    // state and stays stale until we write it back, so trusting it here would
+    // leave the Property (and the painted text) empty while the user types.
+    this.addInputListener({
+      input: (event) => {
+        const target = event.domEvent?.target;
+        answerTextProperty.value = target instanceof HTMLInputElement ? target.value : "";
       },
     });
 

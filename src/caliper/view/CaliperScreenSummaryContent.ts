@@ -42,6 +42,8 @@ export class CaliperScreenSummaryContent extends ScreenSummaryContent {
             return depth;
           case MeasurementMode.STEP:
             return step;
+          default:
+            throw new Error(`Unhandled MeasurementMode: ${mode}`);
         }
       },
     );

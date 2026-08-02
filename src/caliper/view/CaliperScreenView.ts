@@ -31,7 +31,7 @@ import { StringManager } from "../../i18n/StringManager.js";
 import type { VernierScalesPreferencesModel } from "../../preferences/VernierScalesPreferencesModel.js";
 import VernierScalesColors from "../../VernierScalesColors.js";
 import { CONTROL_PANEL_WIDTH, MAX_ZERO_ERROR_TICKS, SCREEN_VIEW_MARGIN } from "../../VernierScalesConstants.js";
-import { ALL_MEASUREMENT_MODES, type CaliperModel, MeasurementMode } from "../model/CaliperModel.js";
+import { type CaliperModel, MeasurementMode } from "../model/CaliperModel.js";
 import { CaliperNode } from "./CaliperNode.js";
 import { CaliperScreenSummaryContent } from "./CaliperScreenSummaryContent.js";
 
@@ -104,18 +104,14 @@ export class CaliperScreenView extends ScreenView {
     );
 
     // ── Which jaws ────────────────────────────────────────────────────────────
-    const modeLabels: Record<MeasurementMode, TReadOnlyProperty<string>> = {
-      [MeasurementMode.OUTSIDE]: strings.modes.outsideStringProperty,
-      [MeasurementMode.INSIDE]: strings.modes.insideStringProperty,
-      [MeasurementMode.DEPTH]: strings.modes.depthStringProperty,
-      [MeasurementMode.STEP]: strings.modes.stepStringProperty,
-    };
     const modeRadioGroup = new AquaRadioButtonGroup(
       model.measurementModeProperty,
-      ALL_MEASUREMENT_MODES.map((mode) => ({
-        value: mode,
-        createNode: () => panelLabel(modeLabels[mode]),
-      })),
+      [
+        { value: MeasurementMode.OUTSIDE, createNode: () => panelLabel(strings.modes.outsideStringProperty) },
+        { value: MeasurementMode.INSIDE, createNode: () => panelLabel(strings.modes.insideStringProperty) },
+        { value: MeasurementMode.DEPTH, createNode: () => panelLabel(strings.modes.depthStringProperty) },
+        { value: MeasurementMode.STEP, createNode: () => panelLabel(strings.modes.stepStringProperty) },
+      ],
       {
         orientation: "vertical",
         align: "left",

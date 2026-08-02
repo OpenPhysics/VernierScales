@@ -12,7 +12,7 @@ general. Forked from `SceneryStackTemplate`; the rename/scaffold scripts have be
 | Vernier Principle (`src/principle/`) | Two bare scales. Choose the geometry and the division count and watch the coincidence move. |
 | Caliper (`src/caliper/`) | A caliper measuring a workpiece with any of its four jaw sets, at any of five scales, with an optional zero error. |
 | Instruments (`src/instruments/`) | A vernier micrometer and a bevel protractor — the vernier on a rotating drum and on a circle. |
-| Practice (`src/practice/`) | A drill. Read the instrument, type the answer, get marked. |
+| Practice (`src/practice/`) | A `vegas` game. Choose a level, read five instruments, type the answers, score. |
 
 ## The one idea to hold onto
 
@@ -38,20 +38,26 @@ Three consequences worth knowing before changing anything:
 
 | File | Purpose |
 |---|---|
-| `src/common/model/vernier.ts` | Pure tick arithmetic. No Properties, no units, no SceneryStack. |
+| `src/common/model/vernier.ts` | Tick arithmetic. `VernierType` is an `EnumerationValue`; otherwise no Properties, no units, no scenery. |
 | `src/common/model/VernierScaleSpec.ts` | Units, presets for ten real instruments, unit conversion |
 | `src/common/model/VernierScaleModel.ts` | The reactive instrument: offset, reading, zero error, keyboard steps |
 | `src/common/model/inchFraction.ts` | Exact reduction, formatting and parsing of mixed inch fractions |
 | `src/common/model/readingFormat.ts` | Reading → text in all three notations; parsing typed answers |
 | `src/common/view/VernierScaleNode.ts` | The two combs, the highlight, drag and keyboard input |
+| `src/common/view/VernierHotkeyData.ts` | Shared vernier HotkeyData bindings (arrows / Page / Home·End) |
+| `src/common/view/createVernierKeyboardListener.ts` | Listener + step helper derived from those bindings |
 | `src/common/view/ScaleViewsNode.ts` | Wide view + magnified view, paired |
 | `src/common/view/ReadingReadoutNode.ts` | The reading shown as its decomposition |
 | `src/common/view/readingProperties.ts` | Locale-aware reactive strings (all `Intl` use lives here) |
-| `src/common/view/VernierKeyboardHelpSection.ts` | Shared "Move the Vernier" help section |
+| `src/common/view/VernierKeyboardHelpSection.ts` | Shared "Move the Vernier" help section (`fromHotkeyData`) |
 | `src/common/view/metalFills.ts` | Gradients and knurling shared by the instrument drawings |
 | `src/caliper/view/CaliperNode.ts` | Graduated beam, forged jaws, vernier plate; jaw gap equals the measurement |
 | `src/instruments/view/MicrometerNode.ts` | C-frame, spindle, rotating thimble |
 | `src/instruments/view/ProtractorNode.ts` | Circular vernier on a dial, read against a fixed blade |
+| `src/practice/model/PracticeModel.ts` | The game: `GameState` machine, levels, challenges, scoring |
+| `src/practice/view/PracticeLevelSelectionNode.ts` | vegas level-selection UI, best scores as stars |
+| `src/practice/view/PracticeChallengeNode.ts` | One challenge; Check / Try Again / Show Answer / Next |
+| `src/practice/view/PracticeStatusBar.ts` | vegas `FiniteStatusBar` in the sim's palette |
 | `src/practice/view/AnswerFieldNode.ts` | A real PDOM `<input>` mirrored into a Property |
 | `src/VernierScalesColors.ts` | All `ProfileColorProperty` instances |
 | `src/VernierScalesConstants.ts` | Named numeric constants (layout px, model defaults) |
@@ -76,6 +82,13 @@ Three consequences worth knowing before changing anything:
   a user is meant to read off.
 - **The Practice screen does not highlight the coincident line** (`highlightCoincidence: false`) and
   its scales are not draggable. Both would hand the student the answer.
+- **The Practice screen is a PhET game built on `vegas`**, not a free-running drill. `GameState` in
+  `PracticeModel` is the single source of truth for what is on screen — level selection, a challenge,
+  or a level result — and the view derives every visibility from it rather than keeping state of its
+  own. Scoring is the PhET standard: two points first try, one on the second, none after. Levels are
+  numbered from 1 because `LevelSelectionButtonGroup` and the `gameLevels` query parameter both
+  assume it. Text that is not a reading at all is not an attempt: it costs nothing and does not move
+  the state machine, because a typo is not evidence about reading a vernier.
 - Screen folders are concept-named (`principle/`, not `principle-screen/`).
 
 ## Compliance carve-outs
@@ -94,7 +107,7 @@ Fleet-standard Vitest layout under root `tests/`, mirroring `src/`.
 | `tests/VernierScaleSpec.test.ts` | The presets against the numbers stamped on the real tools |
 | `tests/readingFormat.test.ts` | Locale separators, angular format, round trips |
 | `tests/VernierScaleModel.test.ts` | Reactive state: unit switching, zero error, keyboard steps |
-| `tests/PracticeModel.test.ts` | Question generation, marking, the tally |
+| `tests/PracticeModel.test.ts` | Challenge generation, marking, the state machine, scoring |
 | `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression (fleet pattern) |
 | `tests/fuzz/fuzz.spec.ts` | Playwright fuzz smoke via joist `?fuzz` |
 

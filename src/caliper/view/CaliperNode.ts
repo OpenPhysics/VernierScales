@@ -35,6 +35,7 @@
 
 import type { TReadOnlyProperty } from "scenerystack/axon";
 import { Multilink } from "scenerystack/axon";
+import { toFixedNumber } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import { optionize } from "scenerystack/phet-core";
 import type { Color } from "scenerystack/scenery";
@@ -42,7 +43,6 @@ import {
   Circle,
   DragListener,
   InteractiveHighlighting,
-  KeyboardListener,
   Node,
   type NodeOptions,
   Path,
@@ -59,6 +59,7 @@ import {
   vernierSpan,
 } from "../../common/model/VernierScaleSpec.js";
 import { vernierDivisionTicks, vernierLabel } from "../../common/model/vernier.js";
+import { createVernierKeyboardListener } from "../../common/view/createVernierKeyboardListener.js";
 import { barFill, knurlShape, shade } from "../../common/view/metalFills.js";
 import VernierScalesColors from "../../VernierScalesColors.js";
 import {
@@ -352,33 +353,7 @@ export class CaliperNode extends Node {
       }),
     );
 
-    this.sliderTargetRect.addInputListener(
-      new KeyboardListener({
-        keys: ["arrowRight", "arrowLeft", "pageUp", "pageDown", "home", "end"],
-        fire: (_event, keysPressed) => {
-          switch (keysPressed) {
-            case "arrowRight":
-              model.stepByLeastCount(1);
-              break;
-            case "arrowLeft":
-              model.stepByLeastCount(-1);
-              break;
-            case "pageUp":
-              model.stepByMainDivision(1);
-              break;
-            case "pageDown":
-              model.stepByMainDivision(-1);
-              break;
-            case "home":
-              model.setMeasurement(0);
-              break;
-            case "end":
-              model.setMeasurement(model.measurementRangeProperty.value);
-              break;
-          }
-        },
-      }),
-    );
+    this.sliderTargetRect.addInputListener(createVernierKeyboardListener(model));
 
     Multilink.multilink(
       [model.measurementProperty, model.specProperty, measurementModeProperty],
@@ -555,8 +530,14 @@ const engravedText = (text: string, centerX: number, bottom: number, leftLimit =
   return node;
 };
 
-/** Drop trailing zeros from an engraved number: `1.5`, but `2` rather than `2.0`. */
-const trimmed = (value: number): string => String(Number(value.toFixed(3)));
+/**
+ * Drop trailing zeros from an engraved number: `1.5`, but `2` rather than `2.0`.
+ *
+ * Uses scenerystack/dot's `toFixedNumber` rather than native `Number.toFixed`
+ * (cross-browser rounding). Period separator kept deliberately — these are
+ * instrument engravings, not UI readouts.
+ */
+const trimmed = (value: number): string => String(toFixedNumber(value, 3));
 
 /** Smallest stride from a round set that keeps marks at least `minimum` apart. */
 const strideFor = (spacing: number, minimum: number): number =>
@@ -622,5 +603,8 @@ const workpieceShape = (mode: MeasurementMode, jawX: number): Shape => {
       const riser = 44;
       return new Shape().rect(0, top, riser, 46).rect(0, top + 46, step + riser, 22);
     }
+
+    default:
+      throw new Error(`Unhandled MeasurementMode: ${mode}`);
   }
 };

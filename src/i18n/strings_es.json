@@ -77,21 +77,27 @@
     "protractorNote": "Doce divisiones del nonio abarcan 23 grados: la resolución es de cinco minutos de arco."
   },
   "practice": {
-    "level": "Tipo de pregunta",
+    "chooseYourLevel": "Elige tu nivel",
     "levels": {
       "metric": "Métrico",
       "imperial": "Imperial",
       "zeroError": "Con error de cero"
     },
+    "levelDescriptions": {
+      "metric": "Calibradores de 0,1, 0,05 y 0,02 mm",
+      "imperial": "Milésimas y 1/128 pulg",
+      "zeroError": "Calibradores que no marcan cero"
+    },
     "prompt": "¿Qué indica el instrumento?",
     "yourAnswer": "Tu respuesta",
     "check": "Comprobar",
-    "newQuestion": "Nueva pregunta",
+    "tryAgain": "Intentar de nuevo",
+    "showAnswer": "Mostrar la respuesta",
+    "next": "Siguiente",
     "correct": "Correcto.",
     "incorrect": "No exactamente: mira otra vez qué línea coincide.",
     "unparseable": "Esa no es una lectura que este instrumento pueda dar.",
     "revealPattern": "La lectura es {{reading}}.",
-    "tallyPattern": "{{correct}} correctas de {{asked}}",
     "fractionHint": "Escribe las fracciones así: 1 37/128.",
     "zeroErrorPrompt": "Error de cero: {{value}}. Corrígelo y escribe la medida verdadera."
   },
@@ -99,7 +105,8 @@
     "principle": {
       "screenSummary": {
         "playArea": "Una escala principal recorre el área de juego, con un nonio que se desliza debajo. Una vista ampliada muestra la región alrededor de la línea donde ambas escalas coinciden.",
-        "controlArea": "El área de control fija cuántas divisiones tiene el nonio y cuál de las tres geometrías usa, y tiene un botón Restablecer todo.",
+        "controlArea": "El área de control fija cuántas divisiones tiene el nonio y tiene un botón Restablecer todo.",
+        "controlAreaWithGeometry": "El área de control fija cuántas divisiones tiene el nonio y cuál de las tres geometrías usa, y tiene un botón Restablecer todo.",
         "interactionHint": "Mueve el nonio a lo largo de la escala principal y observa qué línea se alinea."
       },
       "currentDetails": "El nonio tiene {{divisions}} divisiones, así que una resolución es {{leastCount}}. El cero del nonio pasa de {{main}}, la línea {{index}} coincide, y la lectura es {{reading}}.",
@@ -145,22 +152,32 @@
     },
     "practice": {
       "screenSummary": {
-        "playArea": "Un instrumento está fijado en un valor para que lo leas, mostrado a todo lo ancho con una vista ampliada de la línea coincidente debajo.",
-        "controlArea": "El área de control tiene un campo para tu respuesta, un botón Comprobar, un botón Nueva pregunta, un selector de tipo de pregunta y un botón Restablecer todo.",
-        "interactionHint": "Lee el instrumento, escribe lo que indica y comprueba tu respuesta."
+        "playArea": "Un juego de cinco desafíos. Un instrumento está ajustado a un valor para que lo leas, mostrado a todo lo ancho con una vista ampliada de la línea que coincide debajo.",
+        "controlArea": "El área de control tiene un campo para tu respuesta, botones para comprobarla y para continuar, una barra de estado con el nivel, el número de desafío y la puntuación, y un botón Reiniciar todo.",
+        "interactionHint": "Elige un nivel, lee el instrumento, escribe lo que indica y comprueba tu respuesta."
       },
-      "currentDetails": "Pregunta {{asked}} en la escala {{scale}}. {{tally}}.",
+      "currentDetails": {
+        "levelSelection": "Eligiendo nivel. Hay tres niveles: Métrico, Imperial y Con error de cero.",
+        "challenge": "Nivel {{level}}, desafío {{challenge}} de {{total}}, en la escala {{scale}}. Puntuación {{score}} de {{perfect}}.",
+        "levelCompleted": "Nivel {{level}} completado, con una puntuación de {{score}} de {{perfect}}."
+      },
       "controls": {
         "answer": "Tu respuesta",
         "answerHelp": "Escribe la lectura y luego activa el botón Comprobar.",
         "check": "Comprobar la respuesta",
-        "newQuestion": "Hacer una nueva pregunta",
-        "level": "Tipo de pregunta"
+        "tryAgain": "Intentar esta lectura de nuevo",
+        "showAnswer": "Mostrar la lectura",
+        "next": "Ir al siguiente desafío",
+        "levelButtonPattern": "Nivel {{number}}, {{name}}",
+        "levelButtonHelp": "Comenzar este nivel: cinco instrumentos que leer."
       },
       "responses": {
-        "correct": "Correcto. La lectura es {{reading}}.",
+        "correct": "Correcto. La lectura es {{reading}}. Tu puntuación es ahora {{score}}.",
         "incorrect": "Incorrecto. Mira otra vez qué línea del nonio coincide.",
-        "unparseable": "Esa no es una lectura que este instrumento pueda dar."
+        "unparseable": "Esa no es una lectura que este instrumento pueda dar.",
+        "revealed": "La lectura es {{reading}}.",
+        "levelStarted": "Nivel {{level}} comenzado. Desafío 1 de {{total}}.",
+        "levelCompleted": "Nivel completado. Obtuviste {{score}} de {{perfect}}."
       }
     }
   },
@@ -168,7 +185,8 @@
     "title": "Simulación",
     "startMagnified": "Mostrar la vista ampliada al iniciar",
     "showTrueValue": "Mostrar el valor real",
-    "showCoincidenceMarker": "Marcar la línea coincidente"
+    "showCoincidenceMarker": "Marcar la línea coincidente",
+    "showVernierGeometry": "Mostrar las opciones de geometría del nonio"
   },
   "keyboardHelp": {
     "title": "Mover el nonio",

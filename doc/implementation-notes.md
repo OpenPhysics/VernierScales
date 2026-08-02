@@ -13,10 +13,10 @@ main.ts
   ├─ VernierPrincipleScreen   bare scales — geometry and division count are free
   ├─ CaliperScreen            caliper + workpiece (four jaw modes, five scales)
   ├─ InstrumentsScreen        micrometer (rotating thimble) + bevel protractor
-  └─ PracticeScreen           drill: read the instrument, type the answer
+  └─ PracticeScreen           vegas game: choose a level, read five instruments, score
 
 src/common/model/
-  ├─ vernier.ts               pure tick maths — no axon, no units, no SceneryStack
+  ├─ vernier.ts               tick maths — EnumerationValue for VernierType; no axon/scenery/units
   ├─ VernierScaleSpec.ts      units, ten real-instrument presets, unit conversion
   ├─ VernierScaleModel.ts     reactive instrument: offset, reading, zero error, steps
   ├─ inchFraction.ts          exact reduction / format / parse of mixed inch fractions
@@ -24,19 +24,22 @@ src/common/model/
 
 src/common/view/
   ├─ VernierScaleNode.ts      the two combs, coincidence highlight, drag + keyboard
+  ├─ VernierHotkeyData.ts     shared HotkeyData for vernier motion bindings
+  ├─ createVernierKeyboardListener.ts  listener + step helper from those bindings
   ├─ ScaleViewsNode.ts        wide view + magnified view, paired
   ├─ ReadingReadoutNode.ts    reading shown as its decomposition
   ├─ readingProperties.ts     locale-aware reactive strings (all Intl use lives here)
-  └─ VernierKeyboardHelpSection.ts   shared "Move the Vernier" help section
+  └─ VernierKeyboardHelpSection.ts   shared "Move the Vernier" help (`fromHotkeyData`)
 
 src/caliper/ · src/instruments/ · src/principle/ · src/practice/
   each: model/, view/, *Screen.ts, keyboard help, screen summary
 ```
 
 Data flows Model → View through AXON `Property` objects. The view never integrates
-physics; the model never imports scenery. Pure maths in `vernier.ts` /
-`inchFraction.ts` / `readingFormat.ts` / `VernierScaleSpec.ts` has no axon dependency
-and is fully unit-tested.
+physics; the model never imports scenery. Tick maths in `vernier.ts` uses
+`EnumerationValue` for the three geometries and otherwise has no axon or scenery
+dependency; `inchFraction.ts` / `readingFormat.ts` / `VernierScaleSpec.ts` stay
+fully unit-tested without scenery.
 
 ## Key design decisions
 
@@ -56,15 +59,20 @@ and is fully unit-tested.
   on the Caliper screen — not an artefact to round away.
 - **Zero error is added to the display and subtracted from the report.**
   `offsetTicksProperty` includes it (what the scales show); `readingTicksProperty`
-  corrects it (what you should write down). The Practice screen's third tier drills
+  corrects it (what you should write down). The Practice screen's third level drills
   that correction.
 - **Caliper modes are four dimensions of one workpiece**, not four objects. Switching
   jaws swaps which dimension is read without resetting the others.
-- **Practice questions snap to whole least counts.** A question whose true answer
+- **Practice challenges snap to whole least counts.** A challenge whose true answer
   falls between readable values has no correct response to type. Resolution error is
   taught on the Caliper screen, not used as marking noise here.
 - **Practice never highlights coincidence and is not draggable**
   (`highlightCoincidence: false`) — both would hand the student the answer.
+- **Practice is a `vegas` game, and the model is a state machine.** `GameState` drives
+  every visible difference between choosing a level, playing, and reading a result;
+  the view holds no game state of its own. Scoring is the PhET standard — two points
+  first try, one on the second, none after — and text that is not a reading at all is
+  not an attempt at all.
 - **Every user-visible number goes through `readingProperties.ts`**, keyed off
   `localeProperty`, so `23.14 mm` becomes `23,14 mm` in French/Spanish. Do not use
   `toFixed` for a value a user is meant to read off.
@@ -107,7 +115,7 @@ Fleet-standard Vitest layout under root `tests/`, mirroring `src/`.
 | `tests/VernierScaleSpec.test.ts` | Presets against the numbers stamped on the real tools |
 | `tests/readingFormat.test.ts` | Locale separators, angular format, round trips |
 | `tests/VernierScaleModel.test.ts` | Reactive state: unit switching, zero error, keyboard steps |
-| `tests/PracticeModel.test.ts` | Question generation, marking, the tally |
+| `tests/PracticeModel.test.ts` | Challenge generation, marking, the state machine, scoring |
 | `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression (fleet pattern) |
 | `tests/fuzz/fuzz.spec.ts` | Playwright fuzz smoke via joist `?fuzz` |
 

@@ -57,10 +57,22 @@ export class VernierScalesPreferencesNode extends VBox {
       checkboxOptions("showCoincidenceMarkerCheckbox"),
     );
 
+    const showVernierGeometryCheckbox = new Checkbox(
+      preferencesModel.showVernierGeometryProperty,
+      new Text(prefStrings.showVernierGeometryStringProperty, labelOptions),
+      checkboxOptions("showVernierGeometryCheckbox"),
+    );
+
     super({
       align: "left",
       spacing: 12,
-      children: [header, startMagnifiedCheckbox, showTrueValueCheckbox, showCoincidenceMarkerCheckbox],
+      children: [
+        header,
+        startMagnifiedCheckbox,
+        showTrueValueCheckbox,
+        showCoincidenceMarkerCheckbox,
+        showVernierGeometryCheckbox,
+      ],
     });
   }
 }

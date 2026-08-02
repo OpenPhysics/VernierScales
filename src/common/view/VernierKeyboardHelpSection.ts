@@ -8,33 +8,29 @@
  * That is worth stating plainly in the dialog, because it means a keyboard user
  * always lands on an exactly readable value — an advantage a mouse user does not
  * get, and one they would otherwise have to discover by accident.
+ *
+ * Rows are built from {@link VernierHotkeyData} via `fromHotkeyData`, so the icons
+ * always match the bindings that {@link createVernierKeyboardListener} installs.
  */
 
-import {
-  KeyboardHelpIconFactory,
-  KeyboardHelpSection,
-  KeyboardHelpSectionRow,
-  TextKeyNode,
-} from "scenerystack/scenery-phet";
+import { KeyboardHelpSection, KeyboardHelpSectionRow } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
+import { VernierHotkeyData } from "./VernierHotkeyData.js";
 
 export class VernierKeyboardHelpSection extends KeyboardHelpSection {
   public constructor() {
     const strings = StringManager.getInstance().getKeyboardHelpStrings();
 
     super(strings.titleStringProperty, [
-      KeyboardHelpSectionRow.labelWithIcon(
-        strings.leastCountStringProperty,
-        KeyboardHelpIconFactory.leftRightArrowKeysRowIcon(),
-      ),
-      KeyboardHelpSectionRow.labelWithIcon(
-        strings.mainDivisionStringProperty,
-        KeyboardHelpIconFactory.pageUpPageDownRowIcon(),
-      ),
-      KeyboardHelpSectionRow.labelWithIcon(
-        strings.endsStringProperty,
-        KeyboardHelpIconFactory.iconRow([TextKeyNode.home(), TextKeyNode.end()]),
-      ),
+      KeyboardHelpSectionRow.fromHotkeyData(VernierHotkeyData.LEAST_COUNT, {
+        labelStringProperty: strings.leastCountStringProperty,
+      }),
+      KeyboardHelpSectionRow.fromHotkeyData(VernierHotkeyData.MAIN_DIVISION, {
+        labelStringProperty: strings.mainDivisionStringProperty,
+      }),
+      KeyboardHelpSectionRow.fromHotkeyData(VernierHotkeyData.ENDS, {
+        labelStringProperty: strings.endsStringProperty,
+      }),
     ]);
   }
 }

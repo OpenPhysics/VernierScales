@@ -10,7 +10,7 @@
  * sighted user extracts from the marks.
  */
 
-import { PatternStringProperty } from "scenerystack/axon";
+import { DerivedProperty, PatternStringProperty } from "scenerystack/axon";
 import { ScreenSummaryContent } from "scenerystack/sim";
 import {
   createLeastCountStringProperty,
@@ -18,15 +18,23 @@ import {
   createReadingStringProperty,
 } from "../../common/view/readingProperties.js";
 import { StringManager } from "../../i18n/StringManager.js";
+import type { VernierScalesPreferencesModel } from "../../preferences/VernierScalesPreferencesModel.js";
 import type { VernierPrincipleModel } from "../model/VernierPrincipleModel.js";
 
 export class VernierPrincipleScreenSummaryContent extends ScreenSummaryContent {
-  public constructor(model: VernierPrincipleModel) {
+  public constructor(model: VernierPrincipleModel, preferences: VernierScalesPreferencesModel) {
     const a11y = StringManager.getInstance().getVernierPrincipleA11yStrings();
 
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
-      controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
+      controlAreaContent: new DerivedProperty(
+        [
+          preferences.showVernierGeometryProperty,
+          a11y.screenSummary.controlAreaStringProperty,
+          a11y.screenSummary.controlAreaWithGeometryStringProperty,
+        ],
+        (showGeometry, without, withGeometry) => (showGeometry ? withGeometry : without),
+      ),
       currentDetailsContent: new PatternStringProperty(a11y.currentDetailsStringProperty, {
         divisions: model.divisionsProperty,
         leastCount: createLeastCountStringProperty(model.scale.specProperty),

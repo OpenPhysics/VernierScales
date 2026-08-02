@@ -15,48 +15,42 @@
  * depth, then an outside diameter, on one part.
  */
 
-import { NumberProperty, Property } from "scenerystack/axon";
+import { EnumerationProperty, NumberProperty, type Property } from "scenerystack/axon";
 import type { TModel } from "scenerystack/joist";
+import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
 import { VernierScaleModel } from "../../common/model/VernierScaleModel.js";
 import { CALIPER_SCALE_SPECS, METRIC_FIFTIETH } from "../../common/model/VernierScaleSpec.js";
 import { DEFAULT_MEASUREMENT_MM } from "../../VernierScalesConstants.js";
 
 /** Which pair of jaws (or the depth rod) is doing the measuring. */
-export const MeasurementMode = {
+export class MeasurementMode extends EnumerationValue {
   /** The big lower jaws, closing on an outside dimension. */
-  OUTSIDE: "outside",
+  public static readonly OUTSIDE = new MeasurementMode();
+
   /** The small upper jaws, opening inside a bore. */
-  INSIDE: "inside",
+  public static readonly INSIDE = new MeasurementMode();
+
   /** The rod that extends from the tail of the beam into a blind hole. */
-  DEPTH: "depth",
+  public static readonly DEPTH = new MeasurementMode();
+
   /** The end face of the beam against the end of the slider, across a shoulder. */
-  STEP: "step",
-} as const;
+  public static readonly STEP = new MeasurementMode();
 
-export type MeasurementMode = (typeof MeasurementMode)[keyof typeof MeasurementMode];
-
-/** Every mode, in the order the selector lists them. */
-export const ALL_MEASUREMENT_MODES: readonly MeasurementMode[] = [
-  MeasurementMode.OUTSIDE,
-  MeasurementMode.INSIDE,
-  MeasurementMode.DEPTH,
-  MeasurementMode.STEP,
-] as const;
+  public static readonly enumeration = new Enumeration(MeasurementMode);
+}
 
 /** Starting size of each dimension of the workpiece, in millimetres. */
-const INITIAL_DIMENSIONS_MM: Record<MeasurementMode, number> = {
-  [MeasurementMode.OUTSIDE]: DEFAULT_MEASUREMENT_MM,
-  [MeasurementMode.INSIDE]: 16.6,
-  [MeasurementMode.DEPTH]: 31.45,
-  [MeasurementMode.STEP]: 8.72,
-};
+const INITIAL_OUTSIDE_MM = DEFAULT_MEASUREMENT_MM;
+const INITIAL_INSIDE_MM = 16.6;
+const INITIAL_DEPTH_MM = 31.45;
+const INITIAL_STEP_MM = 8.72;
 
 export class CaliperModel implements TModel {
   /** The caliper's scales. */
   public readonly scale: VernierScaleModel;
 
   /** Which jaws are in use. */
-  public readonly measurementModeProperty = new Property<MeasurementMode>(MeasurementMode.OUTSIDE);
+  public readonly measurementModeProperty = new EnumerationProperty(MeasurementMode.OUTSIDE);
 
   /**
    * Whether the jaws snap to exactly readable sizes. Lives on the scale so that
@@ -65,33 +59,29 @@ export class CaliperModel implements TModel {
   public readonly snapToReadableProperty: Property<boolean>;
 
   /** Size of each dimension of the workpiece, in millimetres. */
-  private readonly dimensionProperties: Record<MeasurementMode, NumberProperty>;
+  private readonly outsideDimensionProperty = new NumberProperty(INITIAL_OUTSIDE_MM);
+  private readonly insideDimensionProperty = new NumberProperty(INITIAL_INSIDE_MM);
+  private readonly depthDimensionProperty = new NumberProperty(INITIAL_DEPTH_MM);
+  private readonly stepDimensionProperty = new NumberProperty(INITIAL_STEP_MM);
 
   public constructor() {
-    this.scale = new VernierScaleModel(METRIC_FIFTIETH, INITIAL_DIMENSIONS_MM[MeasurementMode.OUTSIDE]);
+    this.scale = new VernierScaleModel(METRIC_FIFTIETH, INITIAL_OUTSIDE_MM);
     this.snapToReadableProperty = this.scale.snapToReadableEnabledProperty;
-
-    this.dimensionProperties = {
-      [MeasurementMode.OUTSIDE]: new NumberProperty(INITIAL_DIMENSIONS_MM[MeasurementMode.OUTSIDE]),
-      [MeasurementMode.INSIDE]: new NumberProperty(INITIAL_DIMENSIONS_MM[MeasurementMode.INSIDE]),
-      [MeasurementMode.DEPTH]: new NumberProperty(INITIAL_DIMENSIONS_MM[MeasurementMode.DEPTH]),
-      [MeasurementMode.STEP]: new NumberProperty(INITIAL_DIMENSIONS_MM[MeasurementMode.STEP]),
-    };
 
     // Keep the active dimension and the scale's measurement in step. Only one of
     // the two links can fire at a time — a mode change writes the stored size in,
     // a jaw drag writes the new size out — so there is no feedback loop to break.
     this.measurementModeProperty.lazyLink((mode) => {
-      this.scale.setMeasurement(this.dimensionProperties[mode].value);
+      this.scale.setMeasurement(this.dimensionPropertyFor(mode).value);
     });
     this.scale.measurementProperty.lazyLink((measurement) => {
-      this.dimensionProperties[this.measurementModeProperty.value].value = measurement;
+      this.dimensionPropertyFor(this.measurementModeProperty.value).value = measurement;
     });
   }
 
   /** The dimension currently under the jaws, in millimetres. */
   public get activeDimension(): number {
-    return this.dimensionProperties[this.measurementModeProperty.value].value;
+    return this.dimensionPropertyFor(this.measurementModeProperty.value).value;
   }
 
   /** The scale presets this screen offers. */
@@ -102,15 +92,31 @@ export class CaliperModel implements TModel {
   public reset(): void {
     this.measurementModeProperty.reset();
     this.snapToReadableProperty.reset();
-    for (const mode of ALL_MEASUREMENT_MODES) {
-      this.dimensionProperties[mode].reset();
-    }
+    this.outsideDimensionProperty.reset();
+    this.insideDimensionProperty.reset();
+    this.depthDimensionProperty.reset();
+    this.stepDimensionProperty.reset();
     this.scale.reset();
-    this.scale.setMeasurement(INITIAL_DIMENSIONS_MM[MeasurementMode.OUTSIDE]);
+    this.scale.setMeasurement(INITIAL_OUTSIDE_MM);
   }
 
   /** Nothing here integrates; the screen is entirely user-driven. */
   public step(_dt: number): void {
     // Intentionally empty.
+  }
+
+  private dimensionPropertyFor(mode: MeasurementMode): NumberProperty {
+    switch (mode) {
+      case MeasurementMode.OUTSIDE:
+        return this.outsideDimensionProperty;
+      case MeasurementMode.INSIDE:
+        return this.insideDimensionProperty;
+      case MeasurementMode.DEPTH:
+        return this.depthDimensionProperty;
+      case MeasurementMode.STEP:
+        return this.stepDimensionProperty;
+      default:
+        throw new Error(`Unhandled MeasurementMode: ${mode}`);
+    }
   }
 }

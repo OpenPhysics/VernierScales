@@ -14,21 +14,19 @@
  * pretend otherwise.
  */
 
-import { Property } from "scenerystack/axon";
+import { EnumerationProperty } from "scenerystack/axon";
 import type { TModel } from "scenerystack/joist";
+import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
 import { VernierScaleModel } from "../../common/model/VernierScaleModel.js";
 import { MICROMETER_MICRON, PROTRACTOR_FIVE_MINUTE } from "../../common/model/VernierScaleSpec.js";
 
 /** Which instrument is on the bench. */
-export const Instrument = {
-  MICROMETER: "micrometer",
-  PROTRACTOR: "protractor",
-} as const;
+export class Instrument extends EnumerationValue {
+  public static readonly MICROMETER = new Instrument();
+  public static readonly PROTRACTOR = new Instrument();
 
-export type Instrument = (typeof Instrument)[keyof typeof Instrument];
-
-/** Every instrument, in the order the selector lists them. */
-export const ALL_INSTRUMENTS: readonly Instrument[] = [Instrument.MICROMETER, Instrument.PROTRACTOR] as const;
+  public static readonly enumeration = new Enumeration(Instrument);
+}
 
 /** Starting thimble setting, in millimetres. */
 const INITIAL_MICROMETER_MM = 7.373;
@@ -38,7 +36,7 @@ const INITIAL_PROTRACTOR_DEG = 47 + 25 / 60;
 
 export class InstrumentsModel implements TModel {
   /** Which instrument the screen is showing. */
-  public readonly instrumentProperty = new Property<Instrument>(Instrument.MICROMETER);
+  public readonly instrumentProperty = new EnumerationProperty(Instrument.MICROMETER);
 
   /** The micrometer's sleeve-and-thimble scale. */
   public readonly micrometer = new VernierScaleModel(MICROMETER_MICRON, INITIAL_MICROMETER_MM);

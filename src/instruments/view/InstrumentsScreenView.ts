@@ -23,7 +23,7 @@ import { StringManager } from "../../i18n/StringManager.js";
 import type { VernierScalesPreferencesModel } from "../../preferences/VernierScalesPreferencesModel.js";
 import VernierScalesColors from "../../VernierScalesColors.js";
 import { CONTROL_PANEL_WIDTH, SCREEN_VIEW_MARGIN } from "../../VernierScalesConstants.js";
-import { ALL_INSTRUMENTS, Instrument, type InstrumentsModel } from "../model/InstrumentsModel.js";
+import { Instrument, type InstrumentsModel } from "../model/InstrumentsModel.js";
 import { InstrumentsScreenSummaryContent } from "./InstrumentsScreenSummaryContent.js";
 import { MicrometerNode } from "./MicrometerNode.js";
 import { ProtractorNode } from "./ProtractorNode.js";
@@ -119,16 +119,12 @@ export class InstrumentsScreenView extends ScreenView {
     this.addChild(protractorReadout);
 
     // ── Controls ──────────────────────────────────────────────────────────────
-    const instrumentLabels: Record<Instrument, TReadOnlyProperty<string>> = {
-      [Instrument.MICROMETER]: strings.names.micrometerStringProperty,
-      [Instrument.PROTRACTOR]: strings.names.protractorStringProperty,
-    };
     const instrumentRadioGroup = new AquaRadioButtonGroup(
       model.instrumentProperty,
-      ALL_INSTRUMENTS.map((instrument) => ({
-        value: instrument,
-        createNode: () => panelLabel(instrumentLabels[instrument]),
-      })),
+      [
+        { value: Instrument.MICROMETER, createNode: () => panelLabel(strings.names.micrometerStringProperty) },
+        { value: Instrument.PROTRACTOR, createNode: () => panelLabel(strings.names.protractorStringProperty) },
+      ],
       {
         orientation: "vertical",
         align: "left",

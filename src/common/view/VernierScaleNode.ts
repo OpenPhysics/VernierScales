@@ -29,12 +29,12 @@
  */
 
 import { BooleanProperty, Multilink, type TReadOnlyProperty } from "scenerystack/axon";
+import { localeProperty } from "scenerystack/joist";
 import { Shape } from "scenerystack/kite";
 import { optionize } from "scenerystack/phet-core";
 import {
   DragListener,
   InteractiveHighlighting,
-  KeyboardListener,
   Node,
   type NodeOptions,
   Path,
@@ -51,9 +51,11 @@ import {
   SCALE_TICK_WIDTH,
   VERNIER_TICK_LENGTH,
 } from "../../VernierScalesConstants.js";
+import { formatDecimal } from "../model/readingFormat.js";
 import type { VernierScaleModel } from "../model/VernierScaleModel.js";
 import { fromTicks, ticksToCanonical, type VernierScaleSpec } from "../model/VernierScaleSpec.js";
 import { vernierDivisionTicks, vernierLabel, vernierSpanDivisions } from "../model/vernier.js";
+import { createVernierKeyboardListener } from "./createVernierKeyboardListener.js";
 
 /** What the visible window stays centred on as the vernier moves. */
 export const WindowAnchor = {
@@ -277,7 +279,7 @@ export class VernierScaleNode extends Node {
     clipped.addChild(this.vernierLabelsLayer);
 
     Multilink.multilink(
-      [model.specProperty, model.offsetTicksProperty, model.coincidentIndexProperty],
+      [model.specProperty, model.offsetTicksProperty, model.coincidentIndexProperty, localeProperty],
       (spec, offsetTicks, coincidentIdx) => {
         this.rebuild(spec, offsetTicks, coincidentIdx);
       },
@@ -330,33 +332,7 @@ export class VernierScaleNode extends Node {
       }),
     );
 
-    target.addInputListener(
-      new KeyboardListener({
-        keys: ["arrowRight", "arrowLeft", "pageUp", "pageDown", "home", "end"],
-        fire: (_event, keysPressed) => {
-          switch (keysPressed) {
-            case "arrowRight":
-              model.stepByLeastCount(1);
-              break;
-            case "arrowLeft":
-              model.stepByLeastCount(-1);
-              break;
-            case "pageUp":
-              model.stepByMainDivision(1);
-              break;
-            case "pageDown":
-              model.stepByMainDivision(-1);
-              break;
-            case "home":
-              model.setMeasurement(0);
-              break;
-            case "end":
-              model.setMeasurement(model.measurementRangeProperty.value);
-              break;
-          }
-        },
-      }),
-    );
+    target.addInputListener(createVernierKeyboardListener(model));
 
     this.addChild(target);
     this.dragTarget = target;
@@ -433,6 +409,8 @@ export class VernierScaleNode extends Node {
 
     const firstIndex = Math.floor(startTicks / spec.divisions) - 1;
     const lastIndex = Math.ceil(endTicks / spec.divisions) + 1;
+    // Same Intl path as the readouts so French/Spanish builds use a comma here too.
+    const locale = localeProperty.value.replace("_", "-");
 
     for (let mainIndex = Math.max(firstIndex, 0); mainIndex <= lastIndex; mainIndex++) {
       const x = xOf(mainIndex * spec.divisions);
@@ -443,7 +421,7 @@ export class VernierScaleNode extends Node {
       if (isMajor && this.showMainLabels) {
         const value = fromTicks(spec, mainIndex * spec.divisions);
         this.mainLabelsLayer.addChild(
-          new Text(value.toFixed(placesFor(value)), {
+          new Text(formatDecimal(value, placesFor(value), locale), {
             font: new PhetFont(SCALE_LABEL_FONT_SIZE),
             fill: VernierScalesColors.scaleLabelColorProperty,
             centerX: x,

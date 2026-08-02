@@ -50,7 +50,7 @@ export class VernierPrincipleScreenView extends ScreenView {
   ) {
     const options = optionize<VernierPrincipleScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
       {
-        screenSummaryContent: new VernierPrincipleScreenSummaryContent(model),
+        screenSummaryContent: new VernierPrincipleScreenSummaryContent(model, preferences),
       },
       providedOptions,
     );
@@ -79,7 +79,15 @@ export class VernierPrincipleScreenView extends ScreenView {
     });
     this.addChild(readout);
 
-    // ── Geometry selector ─────────────────────────────────────────────────────
+    // ── Geometry selector (opt-in via Preferences / ?showVernierGeometry) ─────
+    // Off by default: only the everyday direct vernier is available. Turning the
+    // preference on reveals the radio buttons so students can compare geometries.
+    preferences.showVernierGeometryProperty.link((show) => {
+      if (!show) {
+        model.vernierTypeProperty.value = VernierType.DIRECT;
+      }
+    });
+
     const typeRadioGroup = new AquaRadioButtonGroup(
       model.vernierTypeProperty,
       [
@@ -115,6 +123,8 @@ export class VernierPrincipleScreenView extends ScreenView {
               return retrograde;
             case VernierType.EXTENDED:
               return extended;
+            default:
+              throw new Error(`Unhandled VernierType: ${type}`);
           }
         },
       ),
@@ -124,6 +134,20 @@ export class VernierPrincipleScreenView extends ScreenView {
         maxWidth: CONTROL_PANEL_WIDTH - 24,
       },
     );
+
+    const geometryControls = new VBox({
+      align: "left",
+      spacing: 12,
+      visibleProperty: preferences.showVernierGeometryProperty,
+      children: [
+        new Text(strings.geometryStringProperty, {
+          font: new PhetFont({ size: 14, weight: "bold" }),
+          fill: VernierScalesColors.textColorProperty,
+        }),
+        typeRadioGroup,
+        typeDescription,
+      ],
+    });
 
     // ── Division count ────────────────────────────────────────────────────────
     const divisionsControl = new NumberControl(
@@ -182,12 +206,7 @@ export class VernierPrincipleScreenView extends ScreenView {
         align: "left",
         spacing: 12,
         children: [
-          new Text(strings.geometryStringProperty, {
-            font: new PhetFont({ size: 14, weight: "bold" }),
-            fill: VernierScalesColors.textColorProperty,
-          }),
-          typeRadioGroup,
-          typeDescription,
+          geometryControls,
           divisionsControl,
           spanText,
           vernierDivisionText,
@@ -215,7 +234,8 @@ export class VernierPrincipleScreenView extends ScreenView {
     this.addChild(resetAllButton);
 
     // Traversal order: the scales first, since reading them is the task, then
-    // the controls that reshape them, then Reset All.
+    // the controls that reshape them, then Reset All. The geometry radios drop
+    // out of the PDOM when their parent is hidden.
     this.addChild(
       new Node({
         pdomOrder: [scaleViews.dragTarget, typeRadioGroup, divisionsControl, showCoincidenceCheckbox, resetAllButton],

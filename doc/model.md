@@ -119,8 +119,8 @@ One instrument, one scale, four dimensions — all read off the same graduations
 - The simulation ignores every source of error except resolution and zero error. Real measurement
   also contends with jaw wear, measuring force, parallax, thermal expansion, and Abbe error; none
   of those are modelled.
-- Practice questions are always set to values that fall exactly on a least count, so that every
-  question has an answer a student can actually type. Real instruments are under no such
+- Practice challenges are always set to values that fall exactly on a least count, so that every
+  challenge has an answer a student can actually type. Real instruments are under no such
   obligation — which is what the Caliper screen's true-value readout is there to show.
 - The Vernier Principle screen's scale is synthetic: its main division is one millimetre and its
   division count is whatever you choose, including combinations no manufacturer makes. That is

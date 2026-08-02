@@ -77,21 +77,27 @@
     "protractorNote": "Douze divisions du vernier couvrent 23 degrés : la résolution est de cinq minutes d'arc."
   },
   "practice": {
-    "level": "Type de question",
+    "chooseYourLevel": "Choisissez votre niveau",
     "levels": {
       "metric": "Métrique",
       "imperial": "Impérial",
       "zeroError": "Avec erreur de zéro"
     },
+    "levelDescriptions": {
+      "metric": "Pieds à coulisse de 0,1, 0,05 et 0,02 mm",
+      "imperial": "Millièmes et 1/128 po",
+      "zeroError": "Pieds à coulisse qui n'indiquent pas zéro"
+    },
     "prompt": "Que lit l'instrument ?",
     "yourAnswer": "Votre réponse",
     "check": "Vérifier",
-    "newQuestion": "Nouvelle question",
+    "tryAgain": "Réessayer",
+    "showAnswer": "Afficher la réponse",
+    "next": "Suivant",
     "correct": "Correct.",
     "incorrect": "Pas tout à fait — regardez de nouveau quel trait coïncide.",
     "unparseable": "Ce n'est pas une lecture que cet instrument peut donner.",
     "revealPattern": "La lecture est {{reading}}.",
-    "tallyPattern": "{{correct}} bonnes réponses sur {{asked}}",
     "fractionHint": "Écrivez les fractions ainsi : 1 37/128.",
     "zeroErrorPrompt": "Erreur de zéro : {{value}}. Corrigez-la, puis saisissez la mesure vraie."
   },
@@ -99,7 +105,8 @@
     "principle": {
       "screenSummary": {
         "playArea": "Une règle principale traverse la zone de jeu, avec un vernier qui coulisse en dessous. Une vue agrandie montre la région autour du trait où les deux échelles coïncident.",
-        "controlArea": "La zone de contrôle règle le nombre de divisions du vernier et laquelle des trois géométries il utilise, et comporte un bouton Tout réinitialiser.",
+        "controlArea": "La zone de contrôle règle le nombre de divisions du vernier et comporte un bouton Tout réinitialiser.",
+        "controlAreaWithGeometry": "La zone de contrôle règle le nombre de divisions du vernier et laquelle des trois géométries il utilise, et comporte un bouton Tout réinitialiser.",
         "interactionHint": "Déplacez le vernier le long de la règle et observez quel trait s'aligne."
       },
       "currentDetails": "Le vernier a {{divisions}} divisions, donc la résolution vaut {{leastCount}}. Le zéro du vernier dépasse {{main}}, le trait {{index}} coïncide, et la lecture est {{reading}}.",
@@ -145,22 +152,32 @@
     },
     "practice": {
       "screenSummary": {
-        "playArea": "Un instrument est réglé sur une valeur à lire, montré sur toute la largeur avec une vue agrandie du trait coïncidant en dessous.",
-        "controlArea": "La zone de contrôle comporte un champ de réponse, un bouton Vérifier, un bouton Nouvelle question, un sélecteur de type de question et un bouton Tout réinitialiser.",
-        "interactionHint": "Lisez l'instrument, saisissez ce qu'il indique, et vérifiez votre réponse."
+        "playArea": "Un jeu de cinq défis. Un instrument est réglé sur une valeur que vous devez lire, affiché sur toute la largeur avec une vue agrandie du trait qui coïncide en dessous.",
+        "controlArea": "La zone de contrôle comporte un champ pour votre réponse, des boutons pour la vérifier et pour continuer, une barre d'état indiquant le niveau, le numéro du défi et le score, et un bouton Tout réinitialiser.",
+        "interactionHint": "Choisissez un niveau, lisez l'instrument, saisissez sa valeur et vérifiez votre réponse."
       },
-      "currentDetails": "Question {{asked}} sur l'échelle {{scale}}. {{tally}}.",
+      "currentDetails": {
+        "levelSelection": "Choix du niveau. Trois niveaux sont proposés : Métrique, Impérial et Avec erreur de zéro.",
+        "challenge": "Niveau {{level}}, défi {{challenge}} sur {{total}}, échelle {{scale}}. Score {{score}} sur {{perfect}}.",
+        "levelCompleted": "Niveau {{level}} terminé, avec un score de {{score}} sur {{perfect}}."
+      },
       "controls": {
         "answer": "Votre réponse",
         "answerHelp": "Saisissez la lecture, puis activez le bouton Vérifier.",
         "check": "Vérifier la réponse",
-        "newQuestion": "Poser une nouvelle question",
-        "level": "Type de question"
+        "tryAgain": "Réessayer cette lecture",
+        "showAnswer": "Afficher la lecture",
+        "next": "Passer au défi suivant",
+        "levelButtonPattern": "Niveau {{number}}, {{name}}",
+        "levelButtonHelp": "Démarrer ce niveau : cinq instruments à lire."
       },
       "responses": {
-        "correct": "Correct. La lecture est {{reading}}.",
+        "correct": "Correct. La lecture est {{reading}}. Votre score est maintenant {{score}}.",
         "incorrect": "Incorrect. Regardez de nouveau quel trait du vernier coïncide.",
-        "unparseable": "Ce n'est pas une lecture que cet instrument peut donner."
+        "unparseable": "Ce n'est pas une lecture que cet instrument peut donner.",
+        "revealed": "La lecture est {{reading}}.",
+        "levelStarted": "Niveau {{level}} commencé. Défi 1 sur {{total}}.",
+        "levelCompleted": "Niveau terminé. Vous avez obtenu {{score}} sur {{perfect}}."
       }
     }
   },
@@ -168,7 +185,8 @@
     "title": "Simulation",
     "startMagnified": "Afficher la vue agrandie au démarrage",
     "showTrueValue": "Afficher la valeur réelle",
-    "showCoincidenceMarker": "Marquer la ligne coïncidente"
+    "showCoincidenceMarker": "Marquer la ligne coïncidente",
+    "showVernierGeometry": "Afficher le choix de géométrie du vernier"
   },
   "keyboardHelp": {
     "title": "Déplacer le vernier",

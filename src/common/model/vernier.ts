@@ -1,10 +1,11 @@
 /**
  * vernier.ts
  *
- * Pure, dependency-free maths for vernier scales. Everything here is a plain
- * function of plain numbers so it can be unit-tested without SceneryStack;
- * the screen models wrap it in Properties, and the views call it to decide
- * which tick to highlight and where to draw it.
+ * Pure tick-arithmetic for vernier scales — no axon Properties, no scenery, no
+ * units. The only SceneryStack import is {@link EnumerationValue} for the three
+ * vernier geometries. Everything else is a plain function of plain numbers so it
+ * can be unit-tested in isolation; the screen models wrap it in Properties, and
+ * the views call it to decide which tick to highlight and where to draw it.
  *
  * ── Conventions used everywhere in this simulation ────────────────────────────
  *
@@ -30,25 +31,27 @@
  *    what number is printed under it ({@link vernierLabel}).
  */
 
+import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
+
 /**
  * How a vernier scale's divisions relate to the main scale's. All three have the
  * same least count, `mainDivision / n`; they differ in how many main divisions
  * the vernier spans, and therefore in how crowded the marks are.
  */
-export const VernierType = {
+export class VernierType extends EnumerationValue {
   /**
    * `n` vernier divisions span `n - 1` main divisions, so each vernier division
    * is one tick *shorter* than a main division. The common case — a 0.02 mm
    * caliper has 50 divisions spanning 49 mm.
    */
-  DIRECT: "direct",
+  public static readonly DIRECT = new VernierType();
 
   /**
    * `n` vernier divisions span `n + 1` main divisions, so each vernier division
    * is one tick *longer* than a main division. The numbering runs backwards so
    * that the reading still comes out forwards; found on some theodolite circles.
    */
-  RETROGRADE: "retrograde",
+  public static readonly RETROGRADE = new VernierType();
 
   /**
    * `n` vernier divisions span `2n - 1` main divisions — a "Sauter" or long
@@ -57,10 +60,10 @@ export const VernierType = {
    * judge coincidence by eye: the 0.05 mm caliper (20 divisions over 39 mm) and
    * the 5-arcminute bevel protractor (12 divisions over 23°) are both this type.
    */
-  EXTENDED: "extended",
-} as const;
+  public static readonly EXTENDED = new VernierType();
 
-export type VernierType = (typeof VernierType)[keyof typeof VernierType];
+  public static readonly enumeration = new Enumeration(VernierType);
+}
 
 /**
  * Positive remainder. JavaScript's `%` keeps the sign of the dividend, which is
@@ -88,6 +91,8 @@ export const vernierSpanDivisions = (type: VernierType, n: number): number => {
       return n + 1;
     case VernierType.EXTENDED:
       return 2 * n - 1;
+    default:
+      throw new Error(`Unhandled VernierType: ${type}`);
   }
 };
 

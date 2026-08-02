@@ -16,9 +16,20 @@
 
 import { logGlobal } from "scenerystack/phet-core";
 import { QueryStringMachine } from "scenerystack/query-string-machine";
+import { getGameLevelsSchema } from "scenerystack/vegas";
 import VernierScalesNamespace from "../VernierScalesNamespace.js";
 
+/** Levels on the Practice screen; kept in step with the PracticeLevel enumeration. */
+const NUMBER_OF_PRACTICE_LEVELS = 3;
+
 const vernierScalesQueryParameters = QueryStringMachine.getAll({
+  /**
+   * Which Practice-screen levels to offer, numbered from 1. The vegas-standard
+   * parameter, so that a teacher can hand out a link to just one level —
+   * e.g. `?gameLevels=2` for imperial readings alone.
+   */
+  gameLevels: getGameLevelsSchema(NUMBER_OF_PRACTICE_LEVELS),
+
   /**
    * Whether the magnified view of the coincidence starts visible. Turning it off
    * makes the sim harder on purpose: the whole vernier is still there to read,
@@ -49,6 +60,18 @@ const vernierScalesQueryParameters = QueryStringMachine.getAll({
   showCoincidenceMarker: {
     type: "boolean",
     defaultValue: true,
+    public: true,
+  },
+
+  /**
+   * Whether the Vernier Principle screen offers a choice of vernier geometry
+   * (direct, retrograde, extended). Off by default — only the everyday direct
+   * vernier is available — so a teacher can opt in via Preferences or this
+   * parameter when they want students to compare the three arrangements.
+   */
+  showVernierGeometry: {
+    type: "boolean",
+    defaultValue: false,
     public: true,
   },
 });

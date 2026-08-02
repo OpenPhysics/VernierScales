@@ -10,7 +10,7 @@
  * principle is a relationship between two division sizes and nothing else.
  */
 
-import { DerivedProperty, NumberProperty, Property, type TReadOnlyProperty } from "scenerystack/axon";
+import { DerivedProperty, EnumerationProperty, NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import type { TModel } from "scenerystack/joist";
 import { VernierScaleModel } from "../../common/model/VernierScaleModel.js";
 import { createPrincipleSpec, leastCount, type VernierScaleSpec } from "../../common/model/VernierScaleSpec.js";
@@ -24,7 +24,7 @@ const INITIAL_DIVISIONS = 10;
 
 export class VernierPrincipleModel implements TModel {
   /** Which of the three vernier geometries is on show. */
-  public readonly vernierTypeProperty = new Property<VernierType>(VernierType.DIRECT);
+  public readonly vernierTypeProperty = new EnumerationProperty(VernierType.DIRECT);
 
   /** How many divisions the vernier has — the `n` that sets the least count. */
   public readonly divisionsProperty = new NumberProperty(INITIAL_DIVISIONS);

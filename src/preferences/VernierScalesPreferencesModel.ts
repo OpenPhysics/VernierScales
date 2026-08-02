@@ -27,6 +27,13 @@ export class VernierScalesPreferencesModel {
   /** Whether the coincident-line guide is drawn; initial value from `showCoincidenceMarker`. */
   public readonly showCoincidenceMarkerProperty: BooleanProperty;
 
+  /**
+   * Whether the Vernier Principle screen shows the geometry radio buttons;
+   * initial value from `showVernierGeometry`. When false, the screen stays on
+   * the direct vernier only.
+   */
+  public readonly showVernierGeometryProperty: BooleanProperty;
+
   public constructor(tandem?: Tandem) {
     this.startMagnifiedProperty = new BooleanProperty(
       vernierScalesQueryParameters.startMagnified,
@@ -40,12 +47,17 @@ export class VernierScalesPreferencesModel {
       vernierScalesQueryParameters.showCoincidenceMarker,
       tandem ? { tandem: tandem.createTandem("showCoincidenceMarkerProperty") } : undefined,
     );
+    this.showVernierGeometryProperty = new BooleanProperty(
+      vernierScalesQueryParameters.showVernierGeometry,
+      tandem ? { tandem: tandem.createTandem("showVernierGeometryProperty") } : undefined,
+    );
   }
 
   public reset(): void {
     this.startMagnifiedProperty.reset();
     this.showTrueValueProperty.reset();
     this.showCoincidenceMarkerProperty.reset();
+    this.showVernierGeometryProperty.reset();
   }
 }
 

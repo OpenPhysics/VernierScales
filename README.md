@@ -19,8 +19,8 @@ Four screens:
   step faces, at five different scales, with an optional zero error and a true-value readout.
 - **Instruments** — a vernier micrometer (vernier on a rotating thimble) and a bevel protractor
   (circular scale, least count five arcminutes).
-- **Practice** — a drill: the instrument is set, you read it and type the answer. Metric, imperial,
-  and a tier where the tool is miscalibrated.
+- **Practice** — a game, in the PhET `vegas` style: choose a level, read five instruments, type the
+  answers, collect points and stars. Metric, imperial, and a level where the tool is miscalibrated.
 
 Imperial is covered properly: decimal-inch calipers reading 0.001 in and 0.0005 in, and
 fractional-inch ones reading 1/128 in and 1/64 in whose answers are reduced mixed fractions.
