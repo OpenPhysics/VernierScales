@@ -54,6 +54,13 @@ export class VernierScaleModel {
   /** Miscalibration of the instrument, in ticks. Zero for a correctly set tool. */
   public readonly zeroErrorTicksProperty: NumberProperty;
 
+  /**
+   * When true, {@link setMeasurement} quantises to the nearest least count.
+   * Used by the Caliper screen's "Snap to readable values" control so that jaw
+   * and scale drags stay on exactly readable sizes.
+   */
+  public readonly snapToReadableEnabledProperty: Property<boolean>;
+
   /** Largest measurement the active scale can take, in canonical units. */
   public readonly measurementRangeProperty: TReadOnlyProperty<number>;
 
@@ -88,6 +95,7 @@ export class VernierScaleModel {
     this.specProperty = new Property(initialSpec);
     this.measurementProperty = new NumberProperty(initialMeasurement);
     this.zeroErrorTicksProperty = new NumberProperty(0);
+    this.snapToReadableEnabledProperty = new Property(false);
 
     this.measurementRangeProperty = new DerivedProperty([this.specProperty], (spec) => canonicalRange(spec));
 
@@ -131,7 +139,12 @@ export class VernierScaleModel {
 
   /** Set the measured size, clamped to what the active scale can actually take. */
   public setMeasurement(canonicalValue: number): void {
-    this.measurementProperty.value = Math.max(0, Math.min(canonicalValue, this.measurementRangeProperty.value));
+    let value = Math.max(0, Math.min(canonicalValue, this.measurementRangeProperty.value));
+    if (this.snapToReadableEnabledProperty.value) {
+      const spec = this.specProperty.value;
+      value = ticksToCanonical(spec, Math.round(canonicalToTicks(spec, value)));
+    }
+    this.measurementProperty.value = value;
   }
 
   /**
@@ -166,5 +179,6 @@ export class VernierScaleModel {
     this.specProperty.reset();
     this.measurementProperty.reset();
     this.zeroErrorTicksProperty.reset();
+    this.snapToReadableEnabledProperty.reset();
   }
 }

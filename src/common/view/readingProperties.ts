@@ -150,3 +150,21 @@ export const createTrueValueStringProperty = (
       useGrouping: false,
     }).format(specValue)} ${unitSymbol(spec)}`;
   });
+
+/**
+ * A signed quantity in ticks (zero error, for example), rendered like a reading
+ * but always carrying a sign so direction is visible.
+ */
+export const createSignedReadingStringProperty = (
+  ticksProperty: TReadOnlyProperty<number>,
+  specProperty: TReadOnlyProperty<VernierScaleSpec>,
+): TReadOnlyProperty<string> =>
+  new DerivedProperty([ticksProperty, specProperty, localeProperty], (ticks, spec, locale) => {
+    const formatted = new Intl.NumberFormat(intlLocale(locale), {
+      minimumFractionDigits: spec.decimalPlaces,
+      maximumFractionDigits: spec.decimalPlaces,
+      signDisplay: "exceptZero",
+      useGrouping: false,
+    }).format(ticks * leastCount(spec));
+    return `${formatted} ${unitSymbol(spec)}`;
+  });

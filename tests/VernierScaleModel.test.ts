@@ -137,6 +137,25 @@ describe("snapping", () => {
     expect(model.readingErrorProperty.value).toBeCloseTo(0, 9);
     expect(model.readingTicksProperty.value).toBe(1157);
   });
+
+  it("quantises every setMeasurement while snap-to-readable is enabled", () => {
+    const model = new VernierScaleModel(METRIC_FIFTIETH, 0);
+    model.snapToReadableEnabledProperty.value = true;
+    model.setMeasurement(23.137);
+    expect(model.readingErrorProperty.value).toBeCloseTo(0, 9);
+    expect(model.readingTicksProperty.value).toBe(1157);
+
+    model.setMeasurement(10.011);
+    expect(model.readingErrorProperty.value).toBeCloseTo(0, 9);
+    expect(model.measurementProperty.value).toBeCloseTo(10.02, 9);
+  });
+
+  it("leaves continuous values alone while snap-to-readable is off", () => {
+    const model = new VernierScaleModel(METRIC_FIFTIETH, 0);
+    model.setMeasurement(23.137);
+    expect(model.measurementProperty.value).toBeCloseTo(23.137, 9);
+    expect(model.readingErrorProperty.value).not.toBe(0);
+  });
 });
 
 describe("reset", () => {

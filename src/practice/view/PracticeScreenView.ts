@@ -26,7 +26,11 @@ import {
   LIGHT_SURFACE_TEXT_FILL,
 } from "../../common/VernierScalesButtonOptions.js";
 import { VernierScalesPanel } from "../../common/VernierScalesPanel.js";
-import { createReadingStringProperty, createScaleNameProperty } from "../../common/view/readingProperties.js";
+import {
+  createReadingStringProperty,
+  createScaleNameProperty,
+  createSignedReadingStringProperty,
+} from "../../common/view/readingProperties.js";
 import { ScaleViewsNode } from "../../common/view/ScaleViewsNode.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { VernierScalesPreferencesModel } from "../../preferences/VernierScalesPreferencesModel.js";
@@ -85,16 +89,21 @@ export class PracticeScreenView extends ScreenView {
     });
     this.addChild(scaleViews);
 
-    // The zero-error tier needs saying out loud, or a student reads the scale
-    // correctly and is marked wrong for not knowing there was a trap.
-    const zeroErrorPrompt = new Text(strings.zeroErrorPromptStringProperty, {
-      font: new PhetFont(13),
-      fill: VernierScalesColors.coincidenceColorProperty,
-      maxWidth: 500,
-      left: SCREEN_VIEW_MARGIN,
-      top: scaleViews.bottom + 12,
-      visibleProperty: new DerivedProperty([model.scale.zeroErrorTicksProperty], (ticks) => ticks !== 0),
-    });
+    // The zero-error tier needs the magnitude said out loud: the scales are
+    // locked, so the student cannot close the jaws to discover it themselves.
+    const zeroErrorPrompt = new Text(
+      new PatternStringProperty(strings.zeroErrorPromptStringProperty, {
+        value: createSignedReadingStringProperty(model.scale.zeroErrorTicksProperty, model.scale.specProperty),
+      }),
+      {
+        font: new PhetFont(13),
+        fill: VernierScalesColors.coincidenceColorProperty,
+        maxWidth: 500,
+        left: SCREEN_VIEW_MARGIN,
+        top: scaleViews.bottom + 12,
+        visibleProperty: new DerivedProperty([model.scale.zeroErrorTicksProperty], (ticks) => ticks !== 0),
+      },
+    );
     this.addChild(zeroErrorPrompt);
 
     // ── The answer ────────────────────────────────────────────────────────────

@@ -48,7 +48,8 @@ Three consequences worth knowing before changing anything:
 | `src/common/view/ReadingReadoutNode.ts` | The reading shown as its decomposition |
 | `src/common/view/readingProperties.ts` | Locale-aware reactive strings (all `Intl` use lives here) |
 | `src/common/view/VernierKeyboardHelpSection.ts` | Shared "Move the Vernier" help section |
-| `src/caliper/view/CaliperNode.ts` | Schematic caliper; jaw gap equals the measurement |
+| `src/common/view/metalFills.ts` | Gradients and knurling shared by the instrument drawings |
+| `src/caliper/view/CaliperNode.ts` | Graduated beam, forged jaws, vernier plate; jaw gap equals the measurement |
 | `src/instruments/view/MicrometerNode.ts` | C-frame, spindle, rotating thimble |
 | `src/instruments/view/ProtractorNode.ts` | Circular vernier on a dial, read against a fixed blade |
 | `src/practice/view/AnswerFieldNode.ts` | A real PDOM `<input>` mirrored into a Property |
@@ -62,6 +63,11 @@ Three consequences worth knowing before changing anything:
   and numbers in the inverse shade (`scaleFaceColorProperty`, `scaleTickColorProperty`,
   `scaleLabelColorProperty`). Always use these dedicated properties for anything drawn on a scale
   face so the marks track the face; do not substitute the sim's general `textColorProperty`.
+- **Instrument metal is not a scale face.** The caliper's beam and plate and the micrometer's sleeve
+  and thimble are light in *both* profiles, so anything engraved on them uses
+  `instrumentStrokeColorProperty` (dark in both) — a `scaleTickColorProperty` mark would vanish
+  there in default mode. Highlights and shadows are derived from the body colours in
+  `common/view/metalFills.ts` rather than added to the palette.
 - **Never pass `visible: false` alongside a `visibleProperty`.** Scenery applies `visible` after
   `visibleProperty` and writes it through, silently setting the caller's Property to false. Use a
   constant `new BooleanProperty(false)` instead.
