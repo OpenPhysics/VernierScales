@@ -122,6 +122,7 @@
         "jaws": "Caliper jaws",
         "jawsHelp": "Right and left arrows open and close the jaws by one least count. Page Up and Page Down move them one main division.",
         "scale": "Caliper scale",
+        "scaleHelp": "Right and left arrows move the scale one least count. Page Up and Page Down move it one main division.",
         "measurementMode": "Measuring with",
         "zeroError": "Zero error, in least counts",
         "showTrueValue": "Show true value",

@@ -73,7 +73,7 @@ export class CaliperScreenView extends ScreenView {
       interactive: true,
       magnifiedVisibleProperty: preferences.startMagnifiedProperty,
       dragAccessibleName: a11y.controls.scaleStringProperty,
-      dragAccessibleHelpText: a11y.controls.jawsHelpStringProperty,
+      dragAccessibleHelpText: a11y.controls.scaleHelpStringProperty,
       left: SCREEN_VIEW_MARGIN,
       top: 206,
     });

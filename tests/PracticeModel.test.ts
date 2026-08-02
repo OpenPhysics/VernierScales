@@ -220,4 +220,14 @@ describe("the tally", () => {
     expect(model.askedCountProperty.value).toBe(1);
     expect(model.levelProperty.value).toBe(PracticeLevel.METRIC);
   });
+
+  it("asks exactly one question on reset even when the level had changed", () => {
+    const model = new PracticeModel();
+    model.levelProperty.value = PracticeLevel.IMPERIAL;
+    expect(model.askedCountProperty.value).toBeGreaterThan(1);
+
+    model.reset();
+    expect(model.levelProperty.value).toBe(PracticeLevel.METRIC);
+    expect(model.askedCountProperty.value).toBe(1);
+  });
 });

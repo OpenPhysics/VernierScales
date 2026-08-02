@@ -122,6 +122,7 @@
         "jaws": "Mordazas del calibrador",
         "jawsHelp": "Las flechas derecha e izquierda abren y cierran las mordazas una resolución. Retroceder página y Avanzar página las mueven una división principal.",
         "scale": "Escala del calibrador",
+        "scaleHelp": "Las flechas derecha e izquierda mueven la escala una resolución. Retroceder página y Avanzar página la mueven una división principal.",
         "measurementMode": "Midiendo con",
         "zeroError": "Error de cero, en resoluciones",
         "showTrueValue": "Mostrar el valor verdadero",

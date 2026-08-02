@@ -122,6 +122,7 @@
         "jaws": "Becs du pied à coulisse",
         "jawsHelp": "Les flèches droite et gauche ouvrent et ferment les becs d'une résolution. Page précédente et Page suivante les déplacent d'une division principale.",
         "scale": "Échelle du pied à coulisse",
+        "scaleHelp": "Les flèches droite et gauche déplacent l'échelle d'une résolution. Page précédente et Page suivante la déplacent d'une division principale.",
         "measurementMode": "Mesure avec",
         "zeroError": "Erreur de zéro, en résolutions",
         "showTrueValue": "Afficher la valeur vraie",

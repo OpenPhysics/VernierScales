@@ -333,17 +333,20 @@ export class CaliperNode extends Node {
     this.sliderTarget = this.sliderTargetRect;
 
     // ── Input ─────────────────────────────────────────────────────────────────
+    // Delta must be in a frame that does not move with the measurement. The
+    // target lives inside sliderAssembly, which translates as the jaws open, so
+    // parentPoint would chase its own frame and undershoot (worse on slow drags).
     let startPointerX = 0;
     let startMeasurement = 0;
 
     this.sliderTargetRect.addInputListener(
       new DragListener({
         start: (_event, listener) => {
-          startPointerX = listener.parentPoint.x;
+          startPointerX = listener.globalPoint.x;
           startMeasurement = model.measurementProperty.value;
         },
         drag: (_event, listener) => {
-          const deltaUnits = (listener.parentPoint.x - startPointerX) / this.pixelsPerUnit;
+          const deltaUnits = (listener.globalPoint.x - startPointerX) / this.pixelsPerUnit;
           model.setMeasurement(startMeasurement + deltaUnits);
         },
       }),

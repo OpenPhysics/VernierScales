@@ -174,15 +174,16 @@ export class PracticeModel implements TModel {
   }
 
   public reset(): void {
-    this.levelProperty.reset();
     this.correctCountProperty.reset();
     this.askedCountProperty.reset();
     this.scale.reset();
-    this.newQuestion();
 
-    // newQuestion counts the question it just set up; a reset should start from
-    // "none asked yet" plus the one now on screen.
-    this.askedCountProperty.value = 1;
+    // levelProperty.reset fires the lazyLink when the level actually changed, which
+    // already calls newQuestion. Only ask once when the level was already the default.
+    this.levelProperty.reset();
+    if (this.askedCountProperty.value === 0) {
+      this.newQuestion();
+    }
   }
 
   /** Nothing here integrates; the screen is entirely user-driven. */

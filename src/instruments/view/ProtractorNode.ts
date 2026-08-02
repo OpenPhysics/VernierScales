@@ -194,20 +194,23 @@ export class ProtractorNode extends Node {
         .moveTo(DIAL_RADIUS * cos, DIAL_RADIUS * sin)
         .lineTo((DIAL_RADIUS - VERNIER_TICK) * cos, (DIAL_RADIUS - VERNIER_TICK) * sin);
 
-      if (index % 2 === 0 && index < spec.divisions) {
-        const labelRadius = DIAL_RADIUS - VERNIER_TICK - 9;
-        this.labelsLayer.addChild(
-          new Text(String(vernierLabel(index, spec.type, spec.divisions)), {
-            font: new PhetFont(SCALE_LABEL_FONT_SIZE - 1),
-            fill:
-              index === coincidentIdx
-                ? VernierScalesColors.coincidenceColorProperty
-                : VernierScalesColors.scaleLabelColorProperty,
-            centerX: labelRadius * cos,
-            centerY: labelRadius * sin,
-          }),
-        );
-      }
+      // Real 5′ verniers are numbered in arcminutes (0, 5, 10, … 60), not tick
+      // indices — and every division is labelled so an odd-index coincidence still
+      // shows the number a reader would transcribe.
+      const labelIndex = index === spec.divisions ? spec.divisions : vernierLabel(index, spec.type, spec.divisions);
+      const arcminutes = Math.round(labelIndex * leastCount(spec) * 60);
+      const labelRadius = DIAL_RADIUS - VERNIER_TICK - 9;
+      this.labelsLayer.addChild(
+        new Text(String(arcminutes), {
+          font: new PhetFont(SCALE_LABEL_FONT_SIZE - 1),
+          fill:
+            index === coincidentIdx
+              ? VernierScalesColors.coincidenceColorProperty
+              : VernierScalesColors.scaleLabelColorProperty,
+          centerX: labelRadius * cos,
+          centerY: labelRadius * sin,
+        }),
+      );
     }
     this.vernierTicksPath.shape = vernierShape;
     this.coincidentTickPath.shape = coincidentShape;

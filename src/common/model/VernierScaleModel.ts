@@ -28,13 +28,7 @@
  */
 
 import { DerivedProperty, NumberProperty, Property, type TReadOnlyProperty } from "scenerystack/axon";
-import {
-  canonicalRange,
-  canonicalToTicks,
-  leastCount,
-  ticksToCanonical,
-  type VernierScaleSpec,
-} from "./VernierScaleSpec.js";
+import { canonicalRange, canonicalToTicks, ticksToCanonical, type VernierScaleSpec } from "./VernierScaleSpec.js";
 import {
   coincidentIndex,
   correctForZeroError,
@@ -167,12 +161,6 @@ export class VernierScaleModel {
   public snapToReadable(): void {
     const spec = this.specProperty.value;
     this.setMeasurement(ticksToCanonical(spec, Math.round(canonicalToTicks(spec, this.measurementProperty.value))));
-  }
-
-  /** The active scale's least count, in canonical units. */
-  public get canonicalLeastCount(): number {
-    const spec = this.specProperty.value;
-    return ticksToCanonical(spec, 1) - ticksToCanonical(spec, 0) || leastCount(spec);
   }
 
   public reset(): void {
