@@ -53,11 +53,11 @@ export class MicrometerNode extends Node {
       new Shape()
         .moveTo(0, -46)
         .lineTo(-58, -46)
-        .arc(-58, 0, 46, -Math.PI / 2, Math.PI / 2, false)
+        .arc(-58, 0, 46, -Math.PI / 2, Math.PI / 2, true)
         .lineTo(0, 46)
         .lineTo(0, 30)
-        .lineTo(-42, 30)
-        .arc(-58, 0, 30, Math.PI / 2, -Math.PI / 2, true)
+        .lineTo(-58, 30)
+        .arc(-58, 0, 30, Math.PI / 2, -Math.PI / 2, false)
         .lineTo(0, -30)
         .close(),
       { fill: bodyFill, stroke, lineWidth: 1.5 },
