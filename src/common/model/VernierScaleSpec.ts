@@ -42,6 +42,14 @@ export type VernierScaleSpec = {
   /** Stable identifier, used for preset selection and as a string key. */
   readonly id: string;
 
+  /**
+   * Number the main scale every this many divisions. Chosen so the printed
+   * values are the round ones a real instrument carries: every 10 mm on a
+   * millimetre scale, every 0.1 in (4 divisions) on a decimal-inch one, every
+   * whole inch (16 divisions) on a 1/16 in fractional one.
+   */
+  readonly mainLabelInterval: number;
+
   /** Which of the three vernier geometries this scale uses. */
   readonly type: VernierType;
 
@@ -89,11 +97,41 @@ export const fromTicks = (spec: VernierScaleSpec, ticks: number): number => tick
 /** Exact, by definition of the international inch since 1959. */
 export const MILLIMETRES_PER_INCH = 25.4;
 
+/**
+ * Canonical units — millimetres for length, degrees for angle.
+ *
+ * Models store measurements canonically rather than in the active scale's own
+ * units, so that switching a caliper from millimetres to inches re-reads the
+ * *same object* instead of silently reinterpreting 23.14 mm as 23.14 in.
+ */
+export const canonicalPerSpecUnit = (spec: VernierScaleSpec): number =>
+  spec.quantity === ScaleQuantity.LENGTH_IN ? MILLIMETRES_PER_INCH : 1;
+
+/** Canonical value (mm or degrees) → the spec's own units. */
+export const toSpecUnits = (spec: VernierScaleSpec, canonicalValue: number): number =>
+  canonicalValue / canonicalPerSpecUnit(spec);
+
+/** The spec's own units → canonical (mm or degrees). */
+export const fromSpecUnits = (spec: VernierScaleSpec, specValue: number): number =>
+  specValue * canonicalPerSpecUnit(spec);
+
+/** Canonical value straight to ticks of this scale's least count. */
+export const canonicalToTicks = (spec: VernierScaleSpec, canonicalValue: number): number =>
+  toTicks(spec, toSpecUnits(spec, canonicalValue));
+
+/** Ticks of this scale's least count straight to a canonical value. */
+export const ticksToCanonical = (spec: VernierScaleSpec, ticks: number): number =>
+  fromSpecUnits(spec, fromTicks(spec, ticks));
+
+/** The scale's full travel, in canonical units. */
+export const canonicalRange = (spec: VernierScaleSpec): number => fromSpecUnits(spec, spec.range);
+
 // ── Metric calipers ───────────────────────────────────────────────────────────
 
 /** Student caliper: 10 divisions over 9 mm. The one every textbook draws first. */
 export const METRIC_TENTH: VernierScaleSpec = {
   id: "metricTenth",
+  mainLabelInterval: 10,
   type: VernierType.DIRECT,
   divisions: 10,
   mainDivision: 1,
@@ -111,6 +149,7 @@ export const METRIC_TENTH: VernierScaleSpec = {
  */
 export const METRIC_TWENTIETH: VernierScaleSpec = {
   id: "metricTwentieth",
+  mainLabelInterval: 10,
   type: VernierType.EXTENDED,
   divisions: 20,
   mainDivision: 1,
@@ -124,6 +163,7 @@ export const METRIC_TWENTIETH: VernierScaleSpec = {
 /** The usual precision caliper: 50 divisions over 49 mm, reading 0.02 mm. */
 export const METRIC_FIFTIETH: VernierScaleSpec = {
   id: "metricFiftieth",
+  mainLabelInterval: 10,
   type: VernierType.DIRECT,
   divisions: 50,
   mainDivision: 1,
@@ -137,6 +177,7 @@ export const METRIC_FIFTIETH: VernierScaleSpec = {
 /** Half-millimetre main scale, 20 divisions over 19 of them: 0.025 mm. */
 export const METRIC_HALF_MM: VernierScaleSpec = {
   id: "metricHalfMillimetre",
+  mainLabelInterval: 20,
   type: VernierType.DIRECT,
   divisions: 20,
   mainDivision: 0.5,
@@ -156,6 +197,7 @@ export const METRIC_HALF_MM: VernierScaleSpec = {
  */
 export const INCH_THOU: VernierScaleSpec = {
   id: "inchThou",
+  mainLabelInterval: 4,
   type: VernierType.DIRECT,
   divisions: 25,
   mainDivision: 0.025,
@@ -172,6 +214,7 @@ export const INCH_THOU: VernierScaleSpec = {
  */
 export const INCH_HALF_THOU: VernierScaleSpec = {
   id: "inchHalfThou",
+  mainLabelInterval: 4,
   type: VernierType.DIRECT,
   divisions: 50,
   mainDivision: 0.025,
@@ -190,6 +233,7 @@ export const INCH_HALF_THOU: VernierScaleSpec = {
  */
 export const INCH_128: VernierScaleSpec = {
   id: "inch128",
+  mainLabelInterval: 16,
   type: VernierType.DIRECT,
   divisions: 8,
   mainDivision: 1 / 16,
@@ -203,6 +247,7 @@ export const INCH_128: VernierScaleSpec = {
 /** Coarser fractional rule: a 1/8 in main scale, 8 vernier divisions, 1/64 in. */
 export const INCH_64: VernierScaleSpec = {
   id: "inch64",
+  mainLabelInterval: 8,
   type: VernierType.DIRECT,
   divisions: 8,
   mainDivision: 1 / 8,
@@ -222,6 +267,7 @@ export const INCH_64: VernierScaleSpec = {
  */
 export const PROTRACTOR_FIVE_MINUTE: VernierScaleSpec = {
   id: "protractorFiveMinute",
+  mainLabelInterval: 10,
   type: VernierType.EXTENDED,
   divisions: 12,
   mainDivision: 1,
@@ -235,6 +281,7 @@ export const PROTRACTOR_FIVE_MINUTE: VernierScaleSpec = {
 /** Vernier micrometer: a 0.01 mm thimble read to 0.001 mm by a sleeve vernier. */
 export const MICROMETER_MICRON: VernierScaleSpec = {
   id: "micrometerMicron",
+  mainLabelInterval: 10,
   type: VernierType.DIRECT,
   divisions: 10,
   mainDivision: 0.01,
@@ -267,6 +314,45 @@ export const CALIPER_SCALE_SPECS: readonly VernierScaleSpec[] = [
   INCH_THOU,
   INCH_128,
 ] as const;
+
+/**
+ * Decimal places needed to write this scale's least count exactly, capped at
+ * four. A tenth vernier needs one place, a fiftieth needs two, and an eighth
+ * needs three (0.125); counts that do not divide a power of ten — a twelfth,
+ * say — simply get the cap.
+ */
+const placesForLeastCount = (divisions: number): number => {
+  for (let places = 1; places < 4; places++) {
+    const scaled = 10 ** places / divisions;
+    if (Math.abs(scaled - Math.round(scaled)) < 1e-9) {
+      return places;
+    }
+  }
+  return 4;
+};
+
+/**
+ * Build a scale for the Vernier Principle screen, where the user chooses the
+ * geometry and the division count directly rather than picking a real tool.
+ *
+ * The main division is one millimetre so that readings stay concrete and
+ * familiar; nothing else about the screen depends on the unit.
+ */
+export const createPrincipleSpec = (type: VernierType, divisions: number): VernierScaleSpec => ({
+  id: `principle-${type}-${divisions}`,
+  mainLabelInterval: 5,
+  type,
+  divisions,
+  mainDivision: 1,
+  quantity: ScaleQuantity.LENGTH_MM,
+  format: ReadingFormat.DECIMAL,
+  decimalPlaces: placesForLeastCount(divisions),
+  ticksPerUnit: 0,
+  range: 120,
+});
+
+/** Smallest and largest division counts the Principle screen offers. */
+export const PRINCIPLE_DIVISIONS_RANGE = { min: 4, max: 30 } as const;
 
 /** Look a preset up by {@link VernierScaleSpec.id}. */
 export const scaleSpecById = (id: string): VernierScaleSpec | null =>

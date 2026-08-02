@@ -14,6 +14,7 @@ import type { ScreenOptions } from "scenerystack/sim";
 import { Screen } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
 import { createInstrumentsIcon } from "../common/VernierScalesScreenIcons.js";
+import type { VernierScalesPreferencesModel } from "../preferences/VernierScalesPreferencesModel.js";
 import VernierScalesColors from "../VernierScalesColors.js";
 import { InstrumentsModel } from "./model/InstrumentsModel.js";
 import { InstrumentsKeyboardHelpContent } from "./view/InstrumentsKeyboardHelpContent.js";
@@ -23,13 +24,13 @@ import { InstrumentsScreenView } from "./view/InstrumentsScreenView.js";
 type InstrumentsScreenOptions = ScreenOptions & { tandem: Tandem };
 
 export class InstrumentsScreen extends Screen<InstrumentsModel, InstrumentsScreenView> {
-  public constructor(options: InstrumentsScreenOptions) {
+  public constructor(preferences: VernierScalesPreferencesModel, options: InstrumentsScreenOptions) {
     super(
       // Model factory — called once when the screen is first shown
       () => new InstrumentsModel(),
       // View factory — receives the model instance
       (model) =>
-        new InstrumentsScreenView(model, {
+        new InstrumentsScreenView(model, preferences, {
           tandem: options.tandem.createTandem("view"),
         }),
       optionize<InstrumentsScreenOptions, EmptySelfOptions, ScreenOptions>()(

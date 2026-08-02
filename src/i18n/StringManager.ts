@@ -90,6 +90,36 @@ export class StringManager {
     };
   }
 
+  /** Strings shared by every screen: readouts, scale names, vernier-type names. */
+  public getCommonStrings() {
+    return stringProperties.common;
+  }
+
+  /** Labels for the shared vernier section of the keyboard-help dialog. */
+  public getKeyboardHelpStrings() {
+    return stringProperties.keyboardHelp;
+  }
+
+  /** Visible strings for the Vernier Principle screen. */
+  public getPrincipleStrings() {
+    return stringProperties.principle;
+  }
+
+  /** Visible strings for the Caliper screen. */
+  public getCaliperStrings() {
+    return stringProperties.caliper;
+  }
+
+  /** Visible strings for the Instruments screen. */
+  public getInstrumentsStrings() {
+    return stringProperties.instruments;
+  }
+
+  /** Visible strings for the Practice screen. */
+  public getPracticeStrings() {
+    return stringProperties.practice;
+  }
+
   /** Accessibility strings for the Vernier Principle screen. */
   public getVernierPrincipleA11yStrings() {
     return stringProperties.a11y.principle;

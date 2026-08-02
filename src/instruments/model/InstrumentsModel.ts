@@ -1,48 +1,68 @@
 /**
  * InstrumentsModel.ts
  *
- * The top-level model for the simulation screen.
+ * Two instruments that are not calipers, to show that the vernier principle owes
+ * nothing to calipers in particular:
  *
- * Add your simulation's state here using reactive Property objects from
- * scenerystack/axon. The view observes these properties and updates automatically.
+ *  - a **vernier micrometer**, where the vernier reads a *rotating* thimble scale
+ *    and buys a further decimal place (0.001 mm on a 0.01 mm thimble); and
+ *  - a **bevel protractor**, whose scale is a circle and whose least count is an
+ *    angle, five arcminutes.
  *
- * ── Example ──────────────────────────────────────────────────────────────────
- *   import { BooleanProperty, NumberProperty } from "scenerystack/axon";
- *
- *   public readonly isRunningProperty = new BooleanProperty(false);
- *   public readonly timeProperty = new NumberProperty(0);    // seconds
- *
- * ── Step cycle ────────────────────────────────────────────────────────────────
- * The Sim calls step(dt) on every animation frame. Advance your model state
- * in that method (e.g. integrate equations, update positions).
- *
- * ── Reset ─────────────────────────────────────────────────────────────────────
- * reset() is called when the user presses Reset All. Call .reset() on every
- * Property declared here.
+ * Each instrument keeps its own {@link VernierScaleModel} because their units
+ * differ — millimetres against degrees — and a single model would have to
+ * pretend otherwise.
  */
+
+import { Property } from "scenerystack/axon";
 import type { TModel } from "scenerystack/joist";
-import { SharedModel } from "../../common/model/SharedModel.js";
+import { VernierScaleModel } from "../../common/model/VernierScaleModel.js";
+import { MICROMETER_MICRON, PROTRACTOR_FIVE_MINUTE } from "../../common/model/VernierScaleSpec.js";
+
+/** Which instrument is on the bench. */
+export const Instrument = {
+  MICROMETER: "micrometer",
+  PROTRACTOR: "protractor",
+} as const;
+
+export type Instrument = (typeof Instrument)[keyof typeof Instrument];
+
+/** Every instrument, in the order the selector lists them. */
+export const ALL_INSTRUMENTS: readonly Instrument[] = [Instrument.MICROMETER, Instrument.PROTRACTOR] as const;
+
+/** Starting thimble setting, in millimetres. */
+const INITIAL_MICROMETER_MM = 7.373;
+
+/** Starting blade angle, in degrees. 47° 25′ is not a value you can guess. */
+const INITIAL_PROTRACTOR_DEG = 47 + 25 / 60;
 
 export class InstrumentsModel implements TModel {
-  /** Shared helpers — rename SharedModel to a domain type when known. */
-  public readonly shared = new SharedModel();
+  /** Which instrument the screen is showing. */
+  public readonly instrumentProperty = new Property<Instrument>(Instrument.MICROMETER);
 
-  /**
-   * Resets all model state to initial values.
-   * Called when the user presses the Reset All button.
-   */
-  public reset(): void {
-    this.shared.reset();
-    // TODO: call .reset() on every Property declared in this model
+  /** The micrometer's sleeve-and-thimble scale. */
+  public readonly micrometer = new VernierScaleModel(MICROMETER_MICRON, INITIAL_MICROMETER_MM);
+
+  /** The bevel protractor's circular scale. */
+  public readonly protractor = new VernierScaleModel(PROTRACTOR_FIVE_MINUTE, INITIAL_PROTRACTOR_DEG);
+
+  /** Whether to reveal the true value alongside the reading. */
+  public readonly showTrueValueProperty = new Property(false);
+
+  /** The scale belonging to whichever instrument is on show. */
+  public get activeScale(): VernierScaleModel {
+    return this.instrumentProperty.value === Instrument.MICROMETER ? this.micrometer : this.protractor;
   }
 
-  /**
-   * Steps the model forward by dt seconds.
-   * Called every animation frame by the Sim framework.
-   *
-   * @param _dt - elapsed time in seconds since the last frame
-   */
+  public reset(): void {
+    this.instrumentProperty.reset();
+    this.showTrueValueProperty.reset();
+    this.micrometer.reset();
+    this.protractor.reset();
+  }
+
+  /** Nothing here integrates; the screen is entirely user-driven. */
   public step(_dt: number): void {
-    // TODO: advance simulation state here
+    // Intentionally empty.
   }
 }

@@ -1,38 +1,70 @@
 /**
  * InstrumentsScreenSummaryContent.ts
  *
- * The accessible screen summary read by screen readers (SceneryStack's
- * Interactive Description). It appears at the top of the parallel DOM and gives
- * a non-visual user a way to orient themselves and to re-read the simulation's
- * current state at any time.
+ * The accessible screen summary for the Instruments screen.
  *
- * A summary has four regions (all optional, but provide at least the first
- * three in every sim for consistency across OpenPhysics):
- *   - playAreaContent       — what the play area contains
- *   - controlAreaContent    — what the controls do
- *   - currentDetailsContent — a LIVE paragraph describing current state
- *   - interactionHintContent — a short hint on how to get started
- *
- * ── Making "current details" live ─────────────────────────────────────────────
- * The template has no model state, so currentDetails is a static string. In a
- * real sim, build a DerivedProperty over the relevant model Properties and pass
- * it as `currentDetailsContent` so the paragraph updates as the sim runs.
- * See LunarLander/src/.../LunarLanderScreenSummaryContent.ts for the pattern.
+ * The live paragraph follows whichever instrument is on the bench, using
+ * `DynamicProperty`-style switching over the two models so the description never
+ * reports the micrometer's reading while the protractor is showing.
  */
+
+import { DerivedProperty, PatternStringProperty } from "scenerystack/axon";
 import { ScreenSummaryContent } from "scenerystack/sim";
+import { createMainPartStringProperty, createReadingStringProperty } from "../../common/view/readingProperties.js";
 import { StringManager } from "../../i18n/StringManager.js";
-import type { InstrumentsModel } from "../model/InstrumentsModel.js";
+import { Instrument, type InstrumentsModel } from "../model/InstrumentsModel.js";
 
 export class InstrumentsScreenSummaryContent extends ScreenSummaryContent {
-  // `model` is unused in the template but kept in the signature so real sims can
-  // derive a live currentDetailsContent from it without changing call sites.
-  public constructor(_model: InstrumentsModel) {
+  public constructor(model: InstrumentsModel) {
     const a11y = StringManager.getInstance().getInstrumentsA11yStrings();
+    const names = StringManager.getInstance().getInstrumentsStrings().names;
+
+    const instrumentNameProperty = new DerivedProperty(
+      [model.instrumentProperty, names.micrometerStringProperty, names.protractorStringProperty],
+      (instrument, micrometer, protractor) => (instrument === Instrument.MICROMETER ? micrometer : protractor),
+    );
+
+    // Each instrument's parts are built separately and then selected between,
+    // because the two scales have different units and different least counts.
+    const micrometerMain = createMainPartStringProperty(
+      model.micrometer.mainDivisionsReadProperty,
+      model.micrometer.specProperty,
+    );
+    const protractorMain = createMainPartStringProperty(
+      model.protractor.mainDivisionsReadProperty,
+      model.protractor.specProperty,
+    );
+    const micrometerReading = createReadingStringProperty(
+      model.micrometer.readingTicksProperty,
+      model.micrometer.specProperty,
+    );
+    const protractorReading = createReadingStringProperty(
+      model.protractor.readingTicksProperty,
+      model.protractor.specProperty,
+    );
 
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
       controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: a11y.currentDetailsStringProperty,
+      currentDetailsContent: new PatternStringProperty(a11y.currentDetailsStringProperty, {
+        instrument: instrumentNameProperty,
+        main: new DerivedProperty(
+          [model.instrumentProperty, micrometerMain, protractorMain],
+          (instrument, micrometer, protractor) => (instrument === Instrument.MICROMETER ? micrometer : protractor),
+        ),
+        index: new DerivedProperty(
+          [
+            model.instrumentProperty,
+            model.micrometer.vernierLabelReadProperty,
+            model.protractor.vernierLabelReadProperty,
+          ],
+          (instrument, micrometer, protractor) => (instrument === Instrument.MICROMETER ? micrometer : protractor),
+        ),
+        reading: new DerivedProperty(
+          [model.instrumentProperty, micrometerReading, protractorReading],
+          (instrument, micrometer, protractor) => (instrument === Instrument.MICROMETER ? micrometer : protractor),
+        ),
+      }),
       interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
     });
   }

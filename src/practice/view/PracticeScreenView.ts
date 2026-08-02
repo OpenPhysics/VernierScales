@@ -1,43 +1,53 @@
 /**
  * PracticeScreenView.ts
  *
- * The top-level view for the simulation screen.
+ * A drill. The instrument is set to a value, you read it, you type it, the sim
+ * tells you whether you were right.
  *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
+ * Deliberately plain: no score to chase, no levels to unlock, no celebration.
+ * The tally is there so a student can see themselves improving and for no other
+ * reason, and it disappears on reset along with everything else.
  *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. VernierScalesControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
+ * The scales here are not draggable. On every other screen moving the vernier is
+ * the point; here it would let a student walk the instrument to a round number
+ * instead of reading the one in front of them.
  */
 
+import { DerivedProperty, PatternStringProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
-import { ResetAllButton } from "scenerystack/scenery-phet";
+import { HBox, Node, Text, VBox } from "scenerystack/scenery";
+import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
-import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/VernierScalesButtonOptions.js";
+import { AquaRadioButtonGroup, TextPushButton } from "scenerystack/sun";
+import { ReadingFormat } from "../../common/model/VernierScaleSpec.js";
+import {
+  FLAT_RECTANGULAR_BUTTON_OPTIONS,
+  FLAT_RESET_ALL_BUTTON_OPTIONS,
+  LIGHT_SURFACE_TEXT_FILL,
+} from "../../common/VernierScalesButtonOptions.js";
+import { VernierScalesPanel } from "../../common/VernierScalesPanel.js";
+import { createReadingStringProperty, createScaleNameProperty } from "../../common/view/readingProperties.js";
+import { ScaleViewsNode } from "../../common/view/ScaleViewsNode.js";
+import { StringManager } from "../../i18n/StringManager.js";
+import type { VernierScalesPreferencesModel } from "../../preferences/VernierScalesPreferencesModel.js";
 import VernierScalesColors from "../../VernierScalesColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../VernierScalesConstants.js";
-import type { PracticeModel } from "../model/PracticeModel.js";
+import { CONTROL_PANEL_WIDTH, SCREEN_VIEW_MARGIN } from "../../VernierScalesConstants.js";
+import { ALL_PRACTICE_LEVELS, AnswerState, type PracticeLevel, type PracticeModel } from "../model/PracticeModel.js";
+import { AnswerFieldNode } from "./AnswerFieldNode.js";
 import { PracticeScreenSummaryContent } from "./PracticeScreenSummaryContent.js";
 
 export type PracticeScreenViewOptions = ScreenViewOptions;
 
+/** A control label in the panel's text colour. */
+const panelLabel = (stringProperty: TReadOnlyProperty<string>, size = 13): Text =>
+  new Text(stringProperty, { font: new PhetFont(size), fill: VernierScalesColors.textColorProperty });
+
 export class PracticeScreenView extends ScreenView {
-  public constructor(model: PracticeModel, providedOptions?: PracticeScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See PracticeScreenSummaryContent for the four content regions.
+  public constructor(
+    model: PracticeModel,
+    preferences: VernierScalesPreferencesModel,
+    providedOptions?: PracticeScreenViewOptions,
+  ) {
     const options = optionize<PracticeScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
       {
         screenSummaryContent: new PracticeScreenSummaryContent(model),
@@ -46,42 +56,211 @@ export class PracticeScreenView extends ScreenView {
     );
     super(options);
 
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: VernierScalesColors.backgroundColorProperty,
-    });
-    this.addChild(backgroundRect);
+    const strings = StringManager.getInstance().getPracticeStrings();
+    const a11y = StringManager.getInstance().getPracticeA11yStrings();
 
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text("Practice", {
-      font: "bold 36px sans-serif",
+    // ── The question ──────────────────────────────────────────────────────────
+    const promptText = new Text(strings.promptStringProperty, {
+      font: new PhetFont({ size: 17, weight: "bold" }),
       fill: VernierScalesColors.textColorProperty,
-      center: this.layoutBounds.center,
+      left: SCREEN_VIEW_MARGIN,
+      top: 64,
     });
-    this.addChild(placeholderText);
+    this.addChild(promptText);
 
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getPracticeA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.controls.exampleControlStringProperty,
-    //   });
-    //   this.addChild(exampleButton);
+    const scaleNameText = new Text(createScaleNameProperty(model.scale.specProperty), {
+      font: new PhetFont(13),
+      fill: VernierScalesColors.textColorProperty,
+      left: SCREEN_VIEW_MARGIN,
+      top: promptText.bottom + 4,
+    });
+    this.addChild(scaleNameText);
 
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
+    const scaleViews = new ScaleViewsNode(model.scale, {
+      interactive: false,
+      magnifiedVisibleProperty: preferences.startMagnifiedProperty,
+      highlightCoincidence: false,
+      left: SCREEN_VIEW_MARGIN,
+      top: scaleNameText.bottom + 16,
+    });
+    this.addChild(scaleViews);
+
+    // The zero-error tier needs saying out loud, or a student reads the scale
+    // correctly and is marked wrong for not knowing there was a trap.
+    const zeroErrorPrompt = new Text(strings.zeroErrorPromptStringProperty, {
+      font: new PhetFont(13),
+      fill: VernierScalesColors.coincidenceColorProperty,
+      maxWidth: 500,
+      left: SCREEN_VIEW_MARGIN,
+      top: scaleViews.bottom + 12,
+      visibleProperty: new DerivedProperty([model.scale.zeroErrorTicksProperty], (ticks) => ticks !== 0),
+    });
+    this.addChild(zeroErrorPrompt);
+
+    // ── The answer ────────────────────────────────────────────────────────────
+    const answerField = new AnswerFieldNode(model.answerTextProperty, {
+      accessibleName: a11y.controls.answerStringProperty,
+      accessibleHelpText: a11y.controls.answerHelpStringProperty,
+    });
+
+    const checkButton = new TextPushButton(strings.checkStringProperty, {
+      ...FLAT_RECTANGULAR_BUTTON_OPTIONS,
+      textNodeOptions: { font: new PhetFont(15), fill: LIGHT_SURFACE_TEXT_FILL },
+      accessibleName: a11y.controls.checkStringProperty,
+      listener: () => model.checkAnswer(),
+    });
+
+    const newQuestionButton = new TextPushButton(strings.newQuestionStringProperty, {
+      ...FLAT_RECTANGULAR_BUTTON_OPTIONS,
+      textNodeOptions: { font: new PhetFont(15), fill: LIGHT_SURFACE_TEXT_FILL },
+      accessibleName: a11y.controls.newQuestionStringProperty,
+      listener: () => model.newQuestion(),
+    });
+
+    // Only shown for fractional-inch questions, where the expected notation is
+    // not something a student can be assumed to guess.
+    const fractionHint = new Text(strings.fractionHintStringProperty, {
+      font: new PhetFont(11),
+      fill: VernierScalesColors.textColorProperty,
+      visibleProperty: new DerivedProperty(
+        [model.scale.specProperty],
+        (spec) => spec.format === ReadingFormat.FRACTIONAL,
+      ),
+    });
+
+    // ── Feedback ──────────────────────────────────────────────────────────────
+    const feedbackText = new Text(
+      new DerivedProperty(
+        [
+          model.answerStateProperty,
+          strings.correctStringProperty,
+          strings.incorrectStringProperty,
+          strings.unparseableStringProperty,
+        ],
+        (state, correct, incorrect, unparseable) => {
+          switch (state) {
+            case AnswerState.CORRECT:
+              return correct;
+            case AnswerState.INCORRECT:
+              return incorrect;
+            case AnswerState.UNPARSEABLE:
+              return unparseable;
+            case AnswerState.PENDING:
+              return "";
+          }
+        },
+      ),
+      {
+        font: new PhetFont({ size: 15, weight: "bold" }),
+        maxWidth: 420,
+        fill: new DerivedProperty(
+          [
+            model.answerStateProperty,
+            VernierScalesColors.correctColorProperty,
+            VernierScalesColors.incorrectColorProperty,
+          ],
+          (state, correct, incorrect) => (state === AnswerState.CORRECT ? correct : incorrect),
+        ),
+      },
+    );
+
+    // The answer is revealed only once it has been got right, so that a wrong
+    // attempt sends the student back to the scale rather than to the answer.
+    const revealText = new Text(
+      new PatternStringProperty(strings.revealPatternStringProperty, {
+        reading: createReadingStringProperty(model.scale.readingTicksProperty, model.scale.specProperty),
+      }),
+      {
+        font: new PhetFont(14),
+        fill: VernierScalesColors.textColorProperty,
+        visibleProperty: new DerivedProperty([model.answerStateProperty], (state) => state === AnswerState.CORRECT),
+      },
+    );
+
+    // The visual feedback is a colour change and a line of text, neither of which
+    // a screen reader announces on its own. Speaking the verdict is what makes
+    // the drill usable without sight — and the correct-answer response repeats
+    // the reading, which the visible text also does only once it is right.
+    model.answerStateProperty.lazyLink((state) => {
+      if (state === AnswerState.PENDING) {
+        return;
+      }
+      const responses = a11y.responses;
+      if (state === AnswerState.CORRECT) {
+        this.addAccessibleResponse(
+          new PatternStringProperty(responses.correctStringProperty, {
+            reading: createReadingStringProperty(model.scale.readingTicksProperty, model.scale.specProperty),
+          }).value,
+        );
+      } else if (state === AnswerState.INCORRECT) {
+        this.addAccessibleResponse(responses.incorrectStringProperty.value);
+      } else {
+        this.addAccessibleResponse(responses.unparseableStringProperty.value);
+      }
+    });
+
+    const answerRow = new HBox({
+      spacing: 10,
+      align: "center",
+      children: [answerField, checkButton, newQuestionButton],
+    });
+
+    const answerPanel = new VernierScalesPanel(
+      new VBox({
+        align: "left",
+        spacing: 9,
+        children: [panelLabel(strings.yourAnswerStringProperty, 14), answerRow, fractionHint, feedbackText, revealText],
+      }),
+      {
+        left: SCREEN_VIEW_MARGIN,
+        top: scaleViews.bottom + 44,
+      },
+    );
+    this.addChild(answerPanel);
+
+    // ── Level selector and tally ──────────────────────────────────────────────
+    const levelLabels: Record<PracticeLevel, TReadOnlyProperty<string>> = {
+      metric: strings.levels.metricStringProperty,
+      imperial: strings.levels.imperialStringProperty,
+      zeroError: strings.levels.zeroErrorStringProperty,
+    };
+    const levelRadioGroup = new AquaRadioButtonGroup(
+      model.levelProperty,
+      ALL_PRACTICE_LEVELS.map((level) => ({
+        value: level,
+        createNode: () => panelLabel(levelLabels[level]),
+      })),
+      {
+        orientation: "vertical",
+        align: "left",
+        spacing: 7,
+        accessibleName: a11y.controls.levelStringProperty,
+        radioButtonOptions: { radius: 8 },
+      },
+    );
+
+    const tallyText = new Text(
+      new PatternStringProperty(strings.tallyPatternStringProperty, {
+        correct: model.correctCountProperty,
+        asked: model.askedCountProperty,
+      }),
+      { font: new PhetFont(13), fill: VernierScalesColors.textColorProperty },
+    );
+
+    const controlPanel = new VernierScalesPanel(
+      new VBox({
+        align: "left",
+        spacing: 12,
+        children: [panelLabel(strings.levelStringProperty, 14), levelRadioGroup, tallyText],
+      }),
+      {
+        right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
+        top: 64,
+        minWidth: CONTROL_PANEL_WIDTH,
+      },
+    );
+    this.addChild(controlPanel);
+
     const resetAllButton = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
@@ -93,35 +272,14 @@ export class PracticeScreenView extends ScreenView {
     });
     this.addChild(resetAllButton);
 
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
     this.addChild(
       new Node({
-        pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
-          resetAllButton,
-        ],
+        pdomOrder: [answerField, checkButton, newQuestionButton, levelRadioGroup, resetAllButton],
       }),
     );
   }
 
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
   public reset(): void {
-    // TODO: reset any view-side state here
-  }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
-  public override step(_dt: number): void {
-    // TODO: implement animation updates here
+    // No view-side state to reset; everything on screen derives from the model.
   }
 }

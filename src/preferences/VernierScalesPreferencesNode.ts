@@ -27,9 +27,9 @@ export class VernierScalesPreferencesNode extends VBox {
       fill: VernierScalesColors.controlSurfaceTextColorProperty,
     });
 
-    const exampleToggleCheckbox = new Checkbox(
-      preferencesModel.exampleToggleProperty,
-      new Text(prefStrings.exampleToggleStringProperty, {
+    const startMagnifiedCheckbox = new Checkbox(
+      preferencesModel.startMagnifiedProperty,
+      new Text(prefStrings.startMagnifiedStringProperty, {
         font: new PhetFont(14),
         fill: VernierScalesColors.controlSurfaceTextColorProperty,
       }),
@@ -37,14 +37,14 @@ export class VernierScalesPreferencesNode extends VBox {
         checkboxColor: VernierScalesColors.controlSurfaceTextColorProperty,
         checkboxColorBackground: VernierScalesColors.controlSurfaceColorProperty,
         spacing: 8,
-        ...(tandem && { tandem: tandem.createTandem("exampleToggleCheckbox") }),
+        ...(tandem && { tandem: tandem.createTandem("startMagnifiedCheckbox") }),
       },
     );
 
     super({
       align: "left",
       spacing: 12,
-      children: [header, exampleToggleCheckbox],
+      children: [header, startMagnifiedCheckbox],
     });
   }
 }

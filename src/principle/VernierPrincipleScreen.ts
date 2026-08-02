@@ -14,6 +14,7 @@ import type { ScreenOptions } from "scenerystack/sim";
 import { Screen } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
 import { createVernierPrincipleIcon } from "../common/VernierScalesScreenIcons.js";
+import type { VernierScalesPreferencesModel } from "../preferences/VernierScalesPreferencesModel.js";
 import VernierScalesColors from "../VernierScalesColors.js";
 import { VernierPrincipleModel } from "./model/VernierPrincipleModel.js";
 import { VernierPrincipleKeyboardHelpContent } from "./view/VernierPrincipleKeyboardHelpContent.js";
@@ -23,13 +24,13 @@ import { VernierPrincipleScreenView } from "./view/VernierPrincipleScreenView.js
 type VernierPrincipleScreenOptions = ScreenOptions & { tandem: Tandem };
 
 export class VernierPrincipleScreen extends Screen<VernierPrincipleModel, VernierPrincipleScreenView> {
-  public constructor(options: VernierPrincipleScreenOptions) {
+  public constructor(preferences: VernierScalesPreferencesModel, options: VernierPrincipleScreenOptions) {
     super(
       // Model factory — called once when the screen is first shown
       () => new VernierPrincipleModel(),
       // View factory — receives the model instance
       (model) =>
-        new VernierPrincipleScreenView(model, {
+        new VernierPrincipleScreenView(model, preferences, {
           tandem: options.tandem.createTandem("view"),
         }),
       optionize<VernierPrincipleScreenOptions, EmptySelfOptions, ScreenOptions>()(

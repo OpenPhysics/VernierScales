@@ -72,6 +72,81 @@ const VernierScalesColors = {
     projector: "#1a1a1a",
   }),
 
+  // ── Instrument scales ────────────────────────────────────────────────────────
+  // A real caliper is read as dark marks on bright steel, and that contrast is
+  // what makes coincidence judgeable. The scale face therefore stays light in
+  // both profiles, with dark ticks, rather than inverting with the theme.
+
+  /** Face of a scale — the brushed-steel background the marks are engraved into. */
+  scaleFaceColorProperty: new ProfileColorProperty(VernierScalesNamespace, "scaleFace", {
+    default: "#e8eaed",
+    projector: "#fafafa",
+  }),
+
+  /**
+   * Numbers printed on a scale face. Dark in both profiles, like the ticks: the
+   * face stays light whatever the theme, so the sim's general text colour —
+   * near-white in default mode — would be all but invisible on it.
+   */
+  scaleLabelColorProperty: new ProfileColorProperty(VernierScalesNamespace, "scaleLabel", {
+    default: "#20242c",
+    projector: "#20242c",
+  }),
+
+  /** Main-scale tick marks. */
+  scaleTickColorProperty: new ProfileColorProperty(VernierScalesNamespace, "scaleTick", {
+    default: "#20242c",
+    projector: "#20242c",
+  }),
+
+  /** Vernier-scale tick marks, distinguished from the main scale by hue. */
+  vernierTickColorProperty: new ProfileColorProperty(VernierScalesNamespace, "vernierTick", {
+    default: "#1c4f8b",
+    projector: "#1c4f8b",
+  }),
+
+  /** The coincident tick and its readout — the answer the sim is pointing at. */
+  coincidenceColorProperty: new ProfileColorProperty(VernierScalesNamespace, "coincidence", {
+    default: "#d81b60",
+    projector: "#c2185b",
+  }),
+
+  /** Body of the caliper, micrometer or protractor. */
+  instrumentBodyColorProperty: new ProfileColorProperty(VernierScalesNamespace, "instrumentBody", {
+    default: "#b0b7c3",
+    projector: "#c8ced8",
+  }),
+
+  /** The sliding jaw / thimble assembly, a shade darker than the fixed body. */
+  instrumentSliderColorProperty: new ProfileColorProperty(VernierScalesNamespace, "instrumentSlider", {
+    default: "#8d96a5",
+    projector: "#a4acba",
+  }),
+
+  /** Outline on instrument parts. */
+  instrumentStrokeColorProperty: new ProfileColorProperty(VernierScalesNamespace, "instrumentStroke", {
+    default: "#3a4150",
+    projector: "#5a6270",
+  }),
+
+  /** The object being measured, held between the jaws. */
+  workpieceColorProperty: new ProfileColorProperty(VernierScalesNamespace, "workpiece", {
+    default: "#f0a030",
+    projector: "#e08a10",
+  }),
+
+  /** Feedback for a correct answer on the Practice screen. */
+  correctColorProperty: new ProfileColorProperty(VernierScalesNamespace, "correct", {
+    default: "#43a047",
+    projector: "#2e7d32",
+  }),
+
+  /** Feedback for an incorrect answer on the Practice screen. */
+  incorrectColorProperty: new ProfileColorProperty(VernierScalesNamespace, "incorrect", {
+    default: "#e53935",
+    projector: "#c62828",
+  }),
+
   // ── Light control surfaces ───────────────────────────────────────────────────
   // White chrome (combo boxes, flat push buttons, editable input fields) stays light
   // in both profiles; its text stays dark. Same values in default and projector mode,

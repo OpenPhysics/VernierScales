@@ -1,16 +1,40 @@
 # Vernier Scales
 
-A reusable SceneryStack simulation template for one or N screens, built with
-[SceneryStack](https://scenerystack.org/), Vite 8, TypeScript 7, and Biome 2.
+An interactive simulation about reading vernier calipers — and about the vernier principle in
+general — built with [SceneryStack](https://scenerystack.org/), Vite 8, TypeScript 7, and Biome 2.
+
+A vernier scale reads a fraction of a division by sliding a second scale, whose divisions are
+slightly a different size, against the first. Only one pair of lines ever coincides, and which pair
+it is gives you the fraction. This sim takes that one idea and follows it from bare scales to real
+instruments.
+
+## Screens
+
+| Screen | What it does |
+|---|---|
+| **Vernier Principle** | Two bare scales. Choose direct, retrograde or extended geometry and any number of divisions, slide the vernier, and watch the coincidence move. |
+| **Caliper** | A caliper measuring a workpiece with its outside jaws, inside jaws, depth rod or step faces, at five different scales, with an optional zero error and a true-value readout. |
+| **Instruments** | A vernier micrometer, whose vernier reads a rotating thimble, and a bevel protractor, whose scale is a circle and whose least count is five arcminutes. |
+| **Practice** | A drill: the instrument is set, you read it and type the answer. Metric, imperial, and a tier where the tool is miscalibrated. |
+
+Imperial is covered properly: decimal-inch calipers reading 0.001 in and 0.0005 in, and
+fractional-inch ones reading 1/128 in and 1/64 in whose answers are reduced mixed fractions.
+
+The physics and the reading procedure are written up for teachers in [`doc/model.md`](doc/model.md).
 
 ## Features
 
-- SceneryStack scaffold with model/view separation (`rename` + `scaffold-screens` for one or N screens)
-- English, Spanish, and French localization via `StringManager`
+- Every reading shown as its decomposition — main-scale part, coincident line, least count — not
+  just as a finished number
+- Wide and magnified views of the scales, because a vernier is read from the pattern across many
+  marks and confirmed at one
+- Full keyboard control in the instrument's own increments: arrows move one least count, Page
+  Up/Down one main division
+- Live screen-reader descriptions that name which line coincides — the one thing a non-visual user
+  cannot otherwise get
+- English, Spanish, and French localization, with locale-aware decimal separators
 - Default and projector color profiles
 - Progressive Web App (installable, offline-capable)
-- Git hooks for Biome pre-commit checks
-- Shared GitHub Actions CI via `OpenPhysics/Baton`
 
 ## Quick Start
 
@@ -20,26 +44,25 @@ npm run icons    # generate PNG icons from public/icons/icon.svg
 npm start        # dev server → http://localhost:5173
 ```
 
+Requires Node 24+.
+
 ## Scripts
 
 | Command | Description |
 |---|---|
 | `npm start` / `npm run dev` | Start Vite dev server |
 | `npm run build` | Type-check + production build → `dist/` |
+| `npm run build:single` | Single-file build |
 | `npm run preview` | Preview the production build locally |
 | `npm test` | Run Vitest unit tests (includes memory-leak suite) |
-| `npm run test:fuzz` | Optional Playwright fuzz smoke (`?fuzz`, default 15s) |
+| `npm run test:fuzz` | Playwright fuzz smoke (`?fuzz`, default 15s) |
 | `npm run test:fuzz:quick` | Shorter fuzz smoke (10s) |
 | `npm run check` | TypeScript type check |
 | `npm run lint` | Biome lint check |
 | `npm run format` | Auto-format all files |
 | `npm run fix` | Lint + auto-fix |
 | `npm run icons` | Regenerate PNG icons from `public/icons/icon.svg` |
-| `npm run rename` | Sim-level fork/rename (`--id`, `--name`) |
-| `npm run scaffold-screens` | Emit N fleet-named screen packages from `principle/` (`--shared-model` optional) |
 | `npm run clean` | Remove `dist/` |
-
-New sims start at `version: "0.0.0"` in `package.json`. Bump only when cutting a release (for example `npm version patch` and a matching git tag). Keep `name` in kebab-case; it is separate from the SceneryStack sim identifier in `src/init.ts`.
 
 ## Tech Stack
 

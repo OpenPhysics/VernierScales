@@ -1,43 +1,53 @@
 /**
  * VernierPrincipleScreenView.ts
  *
- * The top-level view for the simulation screen.
- *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
- *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. VernierScalesControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
+ * Two bare scales and the controls that shape them. No instrument, no jaws —
+ * just the relationship the rest of the sim is built on.
  */
 
+import { DerivedProperty, PatternStringProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { Range } from "scenerystack/dot";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
-import { ResetAllButton } from "scenerystack/scenery-phet";
+import { Node, Text, VBox } from "scenerystack/scenery";
+import { NumberControl, PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
-import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/VernierScalesButtonOptions.js";
+import { AquaRadioButtonGroup, Checkbox } from "scenerystack/sun";
+import {
+  PRINCIPLE_DIVISIONS_RANGE,
+  spanDivisions,
+  type VernierScaleSpec,
+} from "../../common/model/VernierScaleSpec.js";
+import { VernierType } from "../../common/model/vernier.js";
+import {
+  FLAT_RECTANGULAR_BUTTON_OPTIONS,
+  FLAT_RESET_ALL_BUTTON_OPTIONS,
+} from "../../common/VernierScalesButtonOptions.js";
+import { VernierScalesPanel } from "../../common/VernierScalesPanel.js";
+import { ReadingReadoutNode } from "../../common/view/ReadingReadoutNode.js";
+import {
+  createLeastCountStringProperty,
+  createVernierDivisionStringProperty,
+} from "../../common/view/readingProperties.js";
+import { ScaleViewsNode } from "../../common/view/ScaleViewsNode.js";
+import { StringManager } from "../../i18n/StringManager.js";
+import type { VernierScalesPreferencesModel } from "../../preferences/VernierScalesPreferencesModel.js";
 import VernierScalesColors from "../../VernierScalesColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../VernierScalesConstants.js";
+import { CONTROL_PANEL_WIDTH, SCREEN_VIEW_MARGIN } from "../../VernierScalesConstants.js";
 import type { VernierPrincipleModel } from "../model/VernierPrincipleModel.js";
 import { VernierPrincipleScreenSummaryContent } from "./VernierPrincipleScreenSummaryContent.js";
 
 export type VernierPrincipleScreenViewOptions = ScreenViewOptions;
 
+/** A radio-button or panel label in the panel's text colour. */
+const panelLabel = (stringProperty: TReadOnlyProperty<string>, size = 13): Text =>
+  new Text(stringProperty, { font: new PhetFont(size), fill: VernierScalesColors.textColorProperty });
+
 export class VernierPrincipleScreenView extends ScreenView {
-  public constructor(model: VernierPrincipleModel, providedOptions?: VernierPrincipleScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See VernierPrincipleScreenSummaryContent for the four content regions.
+  public constructor(
+    model: VernierPrincipleModel,
+    preferences: VernierScalesPreferencesModel,
+    providedOptions?: VernierPrincipleScreenViewOptions,
+  ) {
     const options = optionize<VernierPrincipleScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
       {
         screenSummaryContent: new VernierPrincipleScreenSummaryContent(model),
@@ -46,42 +56,153 @@ export class VernierPrincipleScreenView extends ScreenView {
     );
     super(options);
 
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: VernierScalesColors.backgroundColorProperty,
+    const strings = StringManager.getInstance().getPrincipleStrings();
+    const common = StringManager.getInstance().getCommonStrings();
+    const a11y = StringManager.getInstance().getVernierPrincipleA11yStrings();
+
+    // ── The scales ────────────────────────────────────────────────────────────
+    const scaleViews = new ScaleViewsNode(model.scale, {
+      interactive: true,
+      magnifiedVisibleProperty: preferences.startMagnifiedProperty,
+      dragAccessibleName: a11y.controls.vernierStringProperty,
+      dragAccessibleHelpText: a11y.controls.vernierHelpStringProperty,
+      coincidenceMarkerVisibleProperty: model.showConvergenceProperty,
+      left: SCREEN_VIEW_MARGIN,
+      top: 70,
     });
-    this.addChild(backgroundRect);
+    this.addChild(scaleViews);
 
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text("Vernier Principle", {
-      font: "bold 36px sans-serif",
-      fill: VernierScalesColors.textColorProperty,
-      center: this.layoutBounds.center,
+    // ── Reading ───────────────────────────────────────────────────────────────
+    const readout = new ReadingReadoutNode(model.scale, {
+      left: SCREEN_VIEW_MARGIN,
+      top: scaleViews.bottom + 20,
     });
-    this.addChild(placeholderText);
+    this.addChild(readout);
 
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getVernierPrincipleA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.controls.exampleControlStringProperty,
-    //   });
-    //   this.addChild(exampleButton);
+    // ── Geometry selector ─────────────────────────────────────────────────────
+    const typeRadioGroup = new AquaRadioButtonGroup(
+      model.vernierTypeProperty,
+      [
+        { value: VernierType.DIRECT, createNode: () => panelLabel(common.vernierTypes.directStringProperty) },
+        { value: VernierType.RETROGRADE, createNode: () => panelLabel(common.vernierTypes.retrogradeStringProperty) },
+        { value: VernierType.EXTENDED, createNode: () => panelLabel(common.vernierTypes.extendedStringProperty) },
+      ],
+      {
+        orientation: "vertical",
+        align: "left",
+        spacing: 7,
+        accessibleName: a11y.controls.vernierTypeStringProperty,
+        radioButtonOptions: { radius: 8 },
+      },
+    );
 
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
+    // Switching geometry is this screen's main teaching moment, so the change is
+    // stated in words as well as shown — the visual difference between a direct
+    // and an extended vernier is easy to see but hard to name.
+    const typeDescription = new Text(
+      new DerivedProperty(
+        [
+          model.vernierTypeProperty,
+          strings.directDescriptionStringProperty,
+          strings.retrogradeDescriptionStringProperty,
+          strings.extendedDescriptionStringProperty,
+        ],
+        (type, direct, retrograde, extended) => {
+          switch (type) {
+            case VernierType.DIRECT:
+              return direct;
+            case VernierType.RETROGRADE:
+              return retrograde;
+            case VernierType.EXTENDED:
+              return extended;
+          }
+        },
+      ),
+      {
+        font: new PhetFont(12),
+        fill: VernierScalesColors.textColorProperty,
+        maxWidth: CONTROL_PANEL_WIDTH - 24,
+      },
+    );
+
+    // ── Division count ────────────────────────────────────────────────────────
+    const divisionsControl = new NumberControl(
+      strings.divisionsStringProperty,
+      model.divisionsProperty,
+      new Range(PRINCIPLE_DIVISIONS_RANGE.min, PRINCIPLE_DIVISIONS_RANGE.max),
+      {
+        accessibleName: a11y.controls.divisionsStringProperty,
+        titleNodeOptions: { font: new PhetFont(13), fill: VernierScalesColors.textColorProperty },
+        numberDisplayOptions: { textOptions: { font: new PhetFont(13) }, decimalPlaces: 0 },
+        delta: 1,
+        arrowButtonOptions: FLAT_RECTANGULAR_BUTTON_OPTIONS,
+        layoutFunction: NumberControl.createLayoutFunction1(),
+      },
+    );
+
+    // ── Derived facts about the current geometry ──────────────────────────────
+    const spanText = new Text(
+      new PatternStringProperty(strings.spanPatternStringProperty, {
+        count: model.divisionsProperty,
+        span: new DerivedProperty([model.scale.specProperty], (spec: VernierScaleSpec) => spanDivisions(spec)),
+      }),
+      { font: new PhetFont(12), fill: VernierScalesColors.textColorProperty, maxWidth: CONTROL_PANEL_WIDTH - 24 },
+    );
+
+    const vernierDivisionText = new Text(
+      new PatternStringProperty(common.labelPatternStringProperty, {
+        label: strings.vernierDivisionStringProperty,
+        value: createVernierDivisionStringProperty(model.vernierDivisionProperty, model.scale.specProperty),
+      }),
+      { font: new PhetFont(12), fill: VernierScalesColors.textColorProperty },
+    );
+
+    const leastCountText = new Text(
+      new PatternStringProperty(common.labelPatternStringProperty, {
+        label: common.leastCountStringProperty,
+        value: createLeastCountStringProperty(model.scale.specProperty),
+      }),
+      { font: new PhetFont(12), fill: VernierScalesColors.textColorProperty },
+    );
+
+    // ── Coincidence marker toggle ─────────────────────────────────────────────
+    const showCoincidenceCheckbox = new Checkbox(
+      model.showConvergenceProperty,
+      panelLabel(strings.showCoincidenceStringProperty),
+      {
+        accessibleName: a11y.controls.showCoincidenceStringProperty,
+        checkboxColor: VernierScalesColors.textColorProperty,
+        checkboxColorBackground: VernierScalesColors.controlSurfaceColorProperty,
+        spacing: 8,
+      },
+    );
+
+    const controlPanel = new VernierScalesPanel(
+      new VBox({
+        align: "left",
+        spacing: 12,
+        children: [
+          new Text(strings.geometryStringProperty, {
+            font: new PhetFont({ size: 14, weight: "bold" }),
+            fill: VernierScalesColors.textColorProperty,
+          }),
+          typeRadioGroup,
+          typeDescription,
+          divisionsControl,
+          spanText,
+          vernierDivisionText,
+          leastCountText,
+          showCoincidenceCheckbox,
+        ],
+      }),
+      {
+        right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
+        top: 70,
+        minWidth: CONTROL_PANEL_WIDTH,
+      },
+    );
+    this.addChild(controlPanel);
+
     const resetAllButton = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
@@ -93,35 +214,16 @@ export class VernierPrincipleScreenView extends ScreenView {
     });
     this.addChild(resetAllButton);
 
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
+    // Traversal order: the scales first, since reading them is the task, then
+    // the controls that reshape them, then Reset All.
     this.addChild(
       new Node({
-        pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
-          resetAllButton,
-        ],
+        pdomOrder: [scaleViews.dragTarget, typeRadioGroup, divisionsControl, showCoincidenceCheckbox, resetAllButton],
       }),
     );
   }
 
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
   public reset(): void {
-    // TODO: reset any view-side state here
-  }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
-  public override step(_dt: number): void {
-    // TODO: implement animation updates here
+    // No view-side state to reset; everything on screen derives from the model.
   }
 }

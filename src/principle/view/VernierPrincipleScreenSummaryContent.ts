@@ -1,38 +1,39 @@
 /**
  * VernierPrincipleScreenSummaryContent.ts
  *
- * The accessible screen summary read by screen readers (SceneryStack's
- * Interactive Description). It appears at the top of the parallel DOM and gives
- * a non-visual user a way to orient themselves and to re-read the simulation's
- * current state at any time.
+ * The accessible screen summary for the Vernier Principle screen.
  *
- * A summary has four regions (all optional, but provide at least the first
- * three in every sim for consistency across OpenPhysics):
- *   - playAreaContent       — what the play area contains
- *   - controlAreaContent    — what the controls do
- *   - currentDetailsContent — a LIVE paragraph describing current state
- *   - interactionHintContent — a short hint on how to get started
- *
- * ── Making "current details" live ─────────────────────────────────────────────
- * The template has no model state, so currentDetails is a static string. In a
- * real sim, build a DerivedProperty over the relevant model Properties and pass
- * it as `currentDetailsContent` so the paragraph updates as the sim runs.
- * See LunarLander/src/.../LunarLanderScreenSummaryContent.ts for the pattern.
+ * The "current details" paragraph is live, and it carries more of the load here
+ * than in a typical sim: reading a vernier is a visual act, and a screen-reader
+ * user cannot judge coincidence by looking. Naming which line coincides, and the
+ * two numbers that combine into the reading, gives them the same information a
+ * sighted user extracts from the marks.
  */
+
+import { PatternStringProperty } from "scenerystack/axon";
 import { ScreenSummaryContent } from "scenerystack/sim";
+import {
+  createLeastCountStringProperty,
+  createMainPartStringProperty,
+  createReadingStringProperty,
+} from "../../common/view/readingProperties.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { VernierPrincipleModel } from "../model/VernierPrincipleModel.js";
 
 export class VernierPrincipleScreenSummaryContent extends ScreenSummaryContent {
-  // `model` is unused in the template but kept in the signature so real sims can
-  // derive a live currentDetailsContent from it without changing call sites.
-  public constructor(_model: VernierPrincipleModel) {
+  public constructor(model: VernierPrincipleModel) {
     const a11y = StringManager.getInstance().getVernierPrincipleA11yStrings();
 
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
       controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: a11y.currentDetailsStringProperty,
+      currentDetailsContent: new PatternStringProperty(a11y.currentDetailsStringProperty, {
+        divisions: model.divisionsProperty,
+        leastCount: createLeastCountStringProperty(model.scale.specProperty),
+        main: createMainPartStringProperty(model.scale.mainDivisionsReadProperty, model.scale.specProperty),
+        index: model.scale.vernierLabelReadProperty,
+        reading: createReadingStringProperty(model.scale.readingTicksProperty, model.scale.specProperty),
+      }),
       interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
     });
   }

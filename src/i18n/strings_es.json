@@ -1,59 +1,176 @@
 {
-  "title": "Vernier Scales",
+  "title": "Escalas de nonio",
   "screens": {
-    "principle": "Vernier Principle",
-    "caliper": "Caliper",
-    "instruments": "Instruments",
-    "practice": "Practice"
+    "principle": "Principio del nonio",
+    "caliper": "Calibrador",
+    "instruments": "Instrumentos",
+    "practice": "Práctica"
+  },
+  "common": {
+    "reading": "Lectura",
+    "trueValue": "Valor verdadero",
+    "readingError": "Error de lectura",
+    "leastCount": "Resolución",
+    "mainScale": "Escala principal",
+    "vernierScale": "Nonio",
+    "magnified": "Vista ampliada",
+    "showTrueValue": "Mostrar el valor verdadero",
+    "coincidentLine": "Línea coincidente",
+    "readingPattern": "{{main}} + {{index}} × {{leastCount}} = {{reading}}",
+    "valuePattern": "{{value}} {{unit}}",
+    "errorPattern": "{{value}} ({{percent}} de una resolución)",
+    "divisionsPattern": "{{count}} divisiones",
+    "scales": {
+      "metricTenth": "Métrica, 0,1 mm",
+      "metricTwentieth": "Métrica, 0,05 mm",
+      "metricFiftieth": "Métrica, 0,02 mm",
+      "metricHalfMillimetre": "Métrica, 0,025 mm",
+      "inchThou": "Pulgada, 0,001 in",
+      "inchHalfThou": "Pulgada, 0,0005 in",
+      "inch128": "Pulgada, 1/128 in",
+      "inch64": "Pulgada, 1/64 in",
+      "protractorFiveMinute": "Goniómetro, 5 minutos de arco",
+      "micrometerMicron": "Micrómetro, 0,001 mm"
+    },
+    "vernierTypes": {
+      "direct": "Directo",
+      "retrograde": "Retrógrado",
+      "extended": "Extendido"
+    },
+    "labelPattern": "{{label}}: {{value}}"
+  },
+  "principle": {
+    "geometry": "Geometría del nonio",
+    "divisions": "Divisiones del nonio",
+    "mainDivision": "División principal",
+    "vernierDivision": "División del nonio",
+    "spanPattern": "{{count}} divisiones del nonio abarcan {{span}} divisiones principales",
+    "showCoincidence": "Marcar la línea coincidente",
+    "directDescription": "Cada división del nonio es una resolución más corta que una división principal.",
+    "retrogradeDescription": "Cada división del nonio es una resolución más larga, por eso la numeración va al revés.",
+    "extendedDescription": "Cada división del nonio es una resolución menor que dos divisiones principales, lo que separa las marcas."
+  },
+  "caliper": {
+    "scale": "Escala del calibrador",
+    "measurementMode": "Midiendo con",
+    "modes": {
+      "outside": "Mordazas exteriores",
+      "inside": "Mordazas interiores",
+      "depth": "Varilla de profundidad",
+      "step": "Caras de escalón"
+    },
+    "zeroError": "Error de cero",
+    "snapToReadable": "Ajustar a valores legibles",
+    "rawReading": "La escala indica",
+    "correctedReading": "Corregida",
+    "zeroErrorHint": "Un calibrador que no marca cero al cerrarse falsea todas las longitudes en la misma cantidad."
+  },
+  "instruments": {
+    "instrument": "Instrumento",
+    "names": {
+      "micrometer": "Micrómetro con nonio",
+      "protractor": "Goniómetro universal"
+    },
+    "thimble": "Tambor",
+    "blade": "Ángulo de la regla",
+    "micrometerNote": "El nonio del cilindro divide el tambor de 0,01 mm en diez partes.",
+    "protractorNote": "Doce divisiones del nonio abarcan 23 grados: la resolución es de cinco minutos de arco."
+  },
+  "practice": {
+    "level": "Tipo de pregunta",
+    "levels": {
+      "metric": "Métrico",
+      "imperial": "Imperial",
+      "zeroError": "Con error de cero"
+    },
+    "prompt": "¿Qué indica el instrumento?",
+    "yourAnswer": "Tu respuesta",
+    "check": "Comprobar",
+    "newQuestion": "Nueva pregunta",
+    "correct": "Correcto.",
+    "incorrect": "No exactamente: mira otra vez qué línea coincide.",
+    "unparseable": "Esa no es una lectura que este instrumento pueda dar.",
+    "revealPattern": "La lectura es {{reading}}.",
+    "tallyPattern": "{{correct}} correctas de {{asked}}",
+    "fractionHint": "Escribe las fracciones así: 1 37/128.",
+    "zeroErrorPrompt": "Corrige el error de cero y escribe la medida verdadera."
   },
   "a11y": {
     "principle": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "Una escala principal recorre el área de juego, con un nonio que se desliza debajo. Una vista ampliada muestra la región alrededor de la línea donde ambas escalas coinciden.",
+        "controlArea": "El área de control fija cuántas divisiones tiene el nonio y cuál de las tres geometrías usa, y tiene un botón Restablecer todo.",
+        "interactionHint": "Mueve el nonio a lo largo de la escala principal y observa qué línea se alinea."
       },
-      "currentDetails": "La simulación está en su estado inicial.",
+      "currentDetails": "El nonio tiene {{divisions}} divisiones, así que una resolución es {{leastCount}}. El cero del nonio pasa de {{main}}, la línea {{index}} coincide, y la lectura es {{reading}}.",
       "controls": {
-        "exampleControl": "Control de ejemplo"
+        "vernier": "Posición del nonio",
+        "vernierHelp": "Las flechas derecha e izquierda mueven el nonio una resolución. Retroceder página y Avanzar página lo mueven una división principal.",
+        "divisions": "Número de divisiones del nonio",
+        "vernierType": "Geometría del nonio",
+        "showCoincidence": "Marcar la línea coincidente"
       }
     },
     "caliper": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "Un calibrador sostiene una pieza entre sus mordazas. Debajo, sus escalas se muestran a todo lo ancho, con una vista ampliada de la región de la línea coincidente.",
+        "controlArea": "El área de control elige la escala del calibrador y qué mordazas miden, fija un error de cero, y tiene un botón Restablecer todo.",
+        "interactionHint": "Mueve las mordazas y lee la medida en las dos escalas."
       },
-      "currentDetails": "La simulación está en su estado inicial.",
+      "currentDetails": "Midiendo con {{mode}} en la escala {{scale}}. La escala principal pasa de {{main}}, la línea {{index}} coincide, y la medida es {{reading}}.",
       "controls": {
-        "exampleControl": "Control de ejemplo"
+        "jaws": "Mordazas del calibrador",
+        "jawsHelp": "Las flechas derecha e izquierda abren y cierran las mordazas una resolución. Retroceder página y Avanzar página las mueven una división principal.",
+        "scale": "Escala del calibrador",
+        "measurementMode": "Midiendo con",
+        "zeroError": "Error de cero, en resoluciones",
+        "showTrueValue": "Mostrar el valor verdadero",
+        "snapToReadable": "Ajustar a valores legibles"
       }
     },
     "instruments": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "Se muestra un instrumento distinto de un calibrador con su nonio: o un micrómetro, cuyo nonio lee un tambor giratorio, o un goniómetro, cuya escala es un círculo.",
+        "controlArea": "El área de control elige el instrumento y tiene un botón Restablecer todo.",
+        "interactionHint": "Mueve la escala del instrumento y léela igual que un calibrador."
       },
-      "currentDetails": "La simulación está en su estado inicial.",
+      "currentDetails": "El {{instrument}} pasa de {{main}}, la línea {{index}} coincide, y la lectura es {{reading}}.",
       "controls": {
-        "exampleControl": "Control de ejemplo"
+        "instrument": "Instrumento",
+        "scale": "Escala del instrumento",
+        "scaleHelp": "Las flechas derecha e izquierda mueven la escala una resolución. Retroceder página y Avanzar página la mueven una división principal.",
+        "showTrueValue": "Mostrar el valor verdadero"
       }
     },
     "practice": {
       "screenSummary": {
-        "playArea": "El área de juego muestra el contenido principal de la simulación.",
-        "controlArea": "El área de control tiene un botón Restablecer todo que devuelve la simulación a su estado inicial.",
-        "interactionHint": "Explora la simulación interactuando con sus controles."
+        "playArea": "Un instrumento está fijado en un valor para que lo leas, mostrado a todo lo ancho con una vista ampliada de la línea coincidente debajo.",
+        "controlArea": "El área de control tiene un campo para tu respuesta, un botón Comprobar, un botón Nueva pregunta, un selector de tipo de pregunta y un botón Restablecer todo.",
+        "interactionHint": "Lee el instrumento, escribe lo que indica y comprueba tu respuesta."
       },
-      "currentDetails": "La simulación está en su estado inicial.",
+      "currentDetails": "Pregunta {{asked}} en la escala {{scale}}. {{tally}}.",
       "controls": {
-        "exampleControl": "Control de ejemplo"
+        "answer": "Tu respuesta",
+        "answerHelp": "Escribe la lectura y luego activa el botón Comprobar.",
+        "check": "Comprobar la respuesta",
+        "newQuestion": "Hacer una nueva pregunta",
+        "level": "Tipo de pregunta"
+      },
+      "responses": {
+        "correct": "Correcto. La lectura es {{reading}}.",
+        "incorrect": "Incorrecto. Mira otra vez qué línea del nonio coincide.",
+        "unparseable": "Esa no es una lectura que este instrumento pueda dar."
       }
     }
   },
   "preferences": {
     "title": "Simulación",
-    "exampleToggle": "Ejemplo de alternancia"
+    "startMagnified": "Mostrar la vista ampliada al iniciar"
+  },
+  "keyboardHelp": {
+    "title": "Mover el nonio",
+    "leastCount": "Mover una resolución",
+    "mainDivision": "Mover una división principal",
+    "ends": "Ir a cero o al final de la escala"
   }
 }

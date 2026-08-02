@@ -14,6 +14,7 @@ import type { ScreenOptions } from "scenerystack/sim";
 import { Screen } from "scenerystack/sim";
 import type { Tandem } from "scenerystack/tandem";
 import { createPracticeIcon } from "../common/VernierScalesScreenIcons.js";
+import type { VernierScalesPreferencesModel } from "../preferences/VernierScalesPreferencesModel.js";
 import VernierScalesColors from "../VernierScalesColors.js";
 import { PracticeModel } from "./model/PracticeModel.js";
 import { PracticeKeyboardHelpContent } from "./view/PracticeKeyboardHelpContent.js";
@@ -23,13 +24,13 @@ import { PracticeScreenView } from "./view/PracticeScreenView.js";
 type PracticeScreenOptions = ScreenOptions & { tandem: Tandem };
 
 export class PracticeScreen extends Screen<PracticeModel, PracticeScreenView> {
-  public constructor(options: PracticeScreenOptions) {
+  public constructor(preferences: VernierScalesPreferencesModel, options: PracticeScreenOptions) {
     super(
       // Model factory — called once when the screen is first shown
       () => new PracticeModel(),
       // View factory — receives the model instance
       (model) =>
-        new PracticeScreenView(model, {
+        new PracticeScreenView(model, preferences, {
           tandem: options.tandem.createTandem("view"),
         }),
       optionize<PracticeScreenOptions, EmptySelfOptions, ScreenOptions>()(

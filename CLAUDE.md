@@ -4,124 +4,93 @@ Sim-specific context for AI assistants. General SceneryStack guidance: [OpenPhys
 
 ## Project
 
-Reusable SceneryStack template (one or N screens) and **canonical accessibility reference** for
-OpenPhysics sims. Prefer `Baton/scripts/create-sim.sh` (or GitHub **Use this template** +
-`npm run rename` + `npm run scaffold-screens`) to fork it. For multi-screen sims, see
-[`doc/multi-screen.md`](doc/multi-screen.md).
+Four-screen simulation teaching how to read a vernier caliper, and the vernier principle in
+general. Forked from `SceneryStackTemplate`; the rename/scaffold scripts have been removed.
+
+| Screen | What it is for |
+|---|---|
+| Vernier Principle (`src/principle/`) | Two bare scales. Choose the geometry and the division count and watch the coincidence move. |
+| Caliper (`src/caliper/`) | A caliper measuring a workpiece with any of its four jaw sets, at any of five scales, with an optional zero error. |
+| Instruments (`src/instruments/`) | A vernier micrometer and a bevel protractor — the vernier on a rotating drum and on a circle. |
+| Practice (`src/practice/`) | A drill. Read the instrument, type the answer, get marked. |
+
+## The one idea to hold onto
+
+**Everything is measured in "ticks": one tick is one least count.** `src/common/model/vernier.ts`
+knows nothing about millimetres, inches or degrees — it works in integers, so deciding which
+vernier line coincides is integer arithmetic rather than a float comparison against an epsilon.
+`VernierScaleSpec` attaches physical units at the boundary; `VernierScaleModel` wraps the whole
+thing in Properties.
+
+Three consequences worth knowing before changing anything:
+
+- **`coincidentIndex` is derived from the reading, never rounded independently.** `Math.round`
+  breaks half-ties toward +∞, so `round(-x) ≠ -round(x)`; computing the two separately made a
+  retrograde vernier highlight the line printed "8" while the readout said "9". There is a
+  regression test named for this.
+- **The three vernier types differ in geometry and numbering, never in what they read.**
+  `readingTicks` is deliberately independent of `VernierType`.
+- **True value and reading are separate.** The jaws move continuously; the reading quantises. That
+  gap is the instrument's resolution, exposed by "Show true value" on the Caliper screen — it is
+  not an artefact to round away.
 
 ## Key files
 
 | File | Purpose |
 |---|---|
+| `src/common/model/vernier.ts` | Pure tick arithmetic. No Properties, no units, no SceneryStack. |
+| `src/common/model/VernierScaleSpec.ts` | Units, presets for ten real instruments, unit conversion |
+| `src/common/model/VernierScaleModel.ts` | The reactive instrument: offset, reading, zero error, keyboard steps |
+| `src/common/model/inchFraction.ts` | Exact reduction, formatting and parsing of mixed inch fractions |
+| `src/common/model/readingFormat.ts` | Reading → text in all three notations; parsing typed answers |
+| `src/common/view/VernierScaleNode.ts` | The two combs, the highlight, drag and keyboard input |
+| `src/common/view/ScaleViewsNode.ts` | Wide view + magnified view, paired |
+| `src/common/view/ReadingReadoutNode.ts` | The reading shown as its decomposition |
+| `src/common/view/readingProperties.ts` | Locale-aware reactive strings (all `Intl` use lives here) |
+| `src/common/view/VernierKeyboardHelpSection.ts` | Shared "Move the Vernier" help section |
+| `src/caliper/view/CaliperNode.ts` | Schematic caliper; jaw gap equals the measurement |
+| `src/instruments/view/MicrometerNode.ts` | C-frame, spindle, rotating thimble |
+| `src/instruments/view/ProtractorNode.ts` | Circular vernier on a dial, read against a fixed blade |
+| `src/practice/view/AnswerFieldNode.ts` | A real PDOM `<input>` mirrored into a Property |
 | `src/VernierScalesColors.ts` | All `ProfileColorProperty` instances |
-| `src/VernierScalesConstants.ts` | Named numeric constants (layout px, physics SI units) |
-| `src/VernierScalesNamespace.ts` | Namespace for color property names |
+| `src/VernierScalesConstants.ts` | Named numeric constants (layout px, model defaults) |
 | `src/i18n/StringManager.ts` | Singleton localized string accessor |
-| `src/principle/VernierPrincipleScreen.ts` | Screen wrapper |
-| `src/principle/model/VernierPrincipleModel.ts` | Simulation state and logic |
-| `src/principle/view/VernierPrincipleScreenView.ts` | Visual nodes, layout, `screenSummaryContent` + `pdomOrder` |
-| `src/principle/view/VernierPrincipleScreenSummaryContent.ts` | Accessible screen summary (reference a11y pattern) |
-| `src/principle/view/VernierPrincipleKeyboardHelpContent.ts` | Keyboard-help dialog content |
-| `src/common/VernierScalesPanel.ts` | Pre-themed `Panel` wrapper (uses `VernierScalesColors` automatically) |
-| `src/common/VernierScalesButtonOptions.ts` | Flat button-appearance option bundles + light-control-surface combo-box options |
-| `src/common/TimeModel.ts` | Composable play/pause + elapsed-time model for animated sims |
-| `scripts/generate-icons.ts` | PNG icons from `public/icons/icon.svg` |
-| `scripts/rename-sim.ts` | Sim-level fork/rename (package id + metadata, Colors, Constants, Panel, ButtonOptions, Preferences) |
-| `scripts/scaffold-screens.ts` | Emit N screen packages + wire main/strings/icons |
 
-## Common components
+## Conventions specific to this sim
 
-### VernierScalesPanel
-
-Every control panel and info box in the sim should use `VernierScalesPanel` so that
-default/projector color switching is automatic:
-
-```typescript
-import { VernierScalesPanel } from "../../common/VernierScalesPanel.js";
-const panel = new VernierScalesPanel(content);              // uses VernierScalesColors defaults
-const panel = new VernierScalesPanel(content, { xMargin: 20 }); // override any PanelOption
-```
-
-### TimeModel
-
-For simulations with animation, compose `TimeModel` into your screen model:
-
-```typescript
-import { TimeModel } from "../../common/TimeModel.js";
-
-export class MyModel implements TModel {
-  public readonly timer = new TimeModel();   // starts paused; pass true to auto-play
-
-  public step(dt: number): void {
-    this.timer.step(dt);
-    // use this.timer.timeProperty.value for physics
-  }
-  public reset(): void { this.timer.reset(); /* … */ }
-}
-```
-
-Wire the view to `TimeControlNode` from `scenerystack/scenery-phet` binding on
-`model.timer.isPlayingProperty`.
-
-### VernierScalesButtonOptions
-
-SceneryStack's push/round buttons default to a 3-D/beveled look; every button in the sim
-should be flat instead. Spread these into the relevant options object:
-
-```typescript
-import { FLAT_RESET_ALL_BUTTON_OPTIONS, FLAT_RECTANGULAR_BUTTON_OPTIONS } from "../../common/VernierScalesButtonOptions.js";
-
-const resetAllButton = new ResetAllButton({ ...FLAT_RESET_ALL_BUTTON_OPTIONS, listener: () => {...} });
-const exampleButton = new RectangularPushButton({ ...FLAT_RECTANGULAR_BUTTON_OPTIONS, content, listener });
-```
-
-`FLAT_PLAY_PAUSE_STEP_BUTTON_OPTIONS` spreads into `TimeControlNode`'s `playPauseStepButtonOptions`;
-`TIME_CONTROL_SPEED_RADIO_OPTIONS` fixes `TimeControlNode`'s speed-radio label color, which
-otherwise defaults to black text on the sim's dark default-mode panels. `VERNIER_SCALES_COMBO_BOX_OPTIONS`
-themes a `ComboBox`'s button/list chrome to the light control surface below; pair item labels
-with `LIGHT_SURFACE_TEXT_FILL` (not `VernierScalesColors.textColorProperty`, which is for panel-fill text).
-
-`VernierScalesColors.ts` backs this with a "light control surfaces" section —
-`controlSurfaceColorProperty`, `controlSurfaceDisabledColorProperty`,
-`controlSurfaceTextColorProperty` — identical white/dark-text values in both default and
-projector profiles, so any component that must stay light regardless of theme (combo boxes,
-flat buttons, editable fields) keeps readable contrast automatically.
-
-## Accessibility
-
-This template is the **canonical accessibility reference** for OpenPhysics sims. It ships with
-the three required layers wired up: PDOM names, a `VernierPrincipleScreenSummaryContent`, and an explicit
-`pdomOrder` + `VernierPrincipleKeyboardHelpContent`. A11y strings live under the `a11y` key in each locale
-JSON, exposed via `StringManager.getVernierPrincipleA11yStrings()`. When building a real sim, make
-`currentDetailsContent` a live `DerivedProperty` over model state and add `accessibleName`s to
-every interactive node. Full convention and checklist: [Baton/ACCESSIBILITY.md](https://github.com/OpenPhysics/Baton/blob/main/ACCESSIBILITY.md).
+- **Scale faces stay light in both colour profiles**, with dark ticks and dark numbers
+  (`scaleFaceColorProperty`, `scaleTickColorProperty`, `scaleLabelColorProperty`). Using the sim's
+  general `textColorProperty` for anything drawn on a scale face makes it near-invisible in default
+  mode — this has been broken once already.
+- **Never pass `visible: false` alongside a `visibleProperty`.** Scenery applies `visible` after
+  `visibleProperty` and writes it through, silently setting the caller's Property to false. Use a
+  constant `new BooleanProperty(false)` instead.
+- **Every reading goes through `readingProperties.ts`**, which keys off `localeProperty` so that
+  `23.14 mm` becomes `23,14 mm` in the French and Spanish builds. Do not use `toFixed` for a value
+  a user is meant to read off.
+- **The Practice screen does not highlight the coincident line** (`highlightCoincidence: false`) and
+  its scales are not draggable. Both would hand the student the answer.
+- Screen folders are concept-named (`principle/`, not `principle-screen/`).
 
 ## Compliance carve-outs
 
-A clean fork of this template rarely needs compliance carve-outs — root `VernierScalesConstants.ts`,
-`*Colors.ts`, `*Namespace.ts`, standard screen layout, and full a11y wiring pass Baton's
-compliance check out of the box. Document carve-outs in the forked sim's `CLAUDE.md` only when
-you introduce a deliberate deviation (nested constants, hardcoded interaction fills, etc.).
+None. Root `VernierScalesConstants.ts`, `*Colors.ts`, `*Namespace.ts`, standard screen layout and
+full a11y wiring all pass Baton's compliance check as-is.
 
 ## Testing
 
-Fleet-standard Vitest layout (keep when forking):
+Fleet-standard Vitest layout under root `tests/`, mirroring `src/`.
 
-| Path | Purpose |
+| Path | Covers |
 |---|---|
-| `vitest.config.ts` | `happy-dom` environment; `setupFiles: ["./tests/setup.ts"]`; `execArgv: ["--expose-gc"]` |
-| `tests/setup.ts` | Canvas / AudioContext mocks + `init({ name: "…" })` before SceneryStack imports |
-| `tests/TimeModel.test.ts` | Sample model unit tests — replace with real physics tests |
+| `tests/vernier.test.ts` | Tick arithmetic: geometry, coincidence, resolution, zero error |
+| `tests/inchFraction.test.ts` | Fraction reduction, mixed-number formatting, parsing |
+| `tests/VernierScaleSpec.test.ts` | The presets against the numbers stamped on the real tools |
+| `tests/readingFormat.test.ts` | Locale separators, angular format, round trips |
+| `tests/VernierScaleModel.test.ts` | Reactive state: unit switching, zero error, keyboard steps |
+| `tests/PracticeModel.test.ts` | Question generation, marking, the tally |
 | `tests/memory-leak.test.ts` | WeakRef + `forceGC` dispose regression (fleet pattern) |
-| `tests/fuzz/fuzz.spec.ts` | Optional Playwright fuzz smoke via joist `?fuzz` |
-| `playwright.config.ts` | Chromium project + Vite webServer for fuzz |
-
-- Put unit tests only under root `tests/`, mirroring `src/` (never co-locate or use `__tests__/`).
-- Change the `name` passed to `init()` in `tests/setup.ts` to match `package.json` after `npm run rename`.
-- Run `npm test`. CI runs the suite when a `test` script is present.
-- Expand `memory-leak.test.ts` for any component that adds/removes nodes or links Properties at
-  runtime (see OpticsLab for a deep suite).
-- Optional: `npm run test:fuzz` / `test:fuzz:quick` (not part of default CI).
+| `tests/fuzz/fuzz.spec.ts` | Playwright fuzz smoke via joist `?fuzz` |
 
 ## Commands
 
@@ -134,71 +103,21 @@ npm run lint && npm run check && npm run build && npm test
 | `npm start` / `npm run dev` | Vite dev server |
 | `npm run build` | Type-check + production build |
 | `npm run build:single` | Single-file build mode |
-| `npm run check` | TypeScript (`tsc --noEmit` + scripts project) |
+| `npm run check` | TypeScript (`tsc --noEmit` + scripts and test projects) |
 | `npm run lint` / `npm run fix` | Biome check / auto-fix |
 | `npm test` | Vitest unit tests |
-| `npm run test:fuzz` | Playwright fuzz smoke |
-| `npm run test:fuzz:quick` | 10s fuzz |
+| `npm run test:fuzz` / `test:fuzz:quick` | Playwright fuzz smoke (10 s for the quick one) |
 | `npm run icons` | Regenerate PWA icons |
-| `npm run rename` | Sim-level fork/rename (`--id`, `--name`) |
-| `npm run scaffold-screens` | Emit N screens (`--screens Intro,Lab`) |
 
-## Customizing a new sim from this template
+Requires Node 24+.
 
-### Recommended: Baton create-sim
+## Adding a screen
 
-```sh
-Baton/scripts/create-sim.sh --repo Friction --name "Friction" --screens Intro,Lab --shared-model --onboard
-```
-
-### Manual: GitHub template + rename + scaffold
-
-```sh
-npm install
-npm run rename -- --id friction --name "Friction"
-npm run scaffold-screens -- --screens Intro,Lab --shared-model
-# omit --screens for one screen named after the sim; omit --shared-model for independent models
-npm run fix     # required: both scripts reorder imports, which Biome then sorts
-npm run check
-```
-
-`rename` updates package id and metadata, display name, and every sim-level `Sim*`
-(Colors, Constants, Namespace, Panel, ButtonOptions, Preferences, query parameters).
-`scaffold-screens` owns screen folders (fleet naming: `src/intro/`, not `intro-screen/`).
-After both steps no `Sim*` identifier should remain — `grep -rn '\bSim[A-Z_]' src` to confirm.
-
-### Manual checklist (if not using the scripts)
-
-1. **Rename** — replace `vernier-scales` / `Vernier Scales` / `Sim` prefix in `init.ts`, `brand.ts`, `package.json` (name, description, keywords, repository.url), Colors/Constants/Namespace/Panel/ButtonOptions/Preferences
-2. **Screens** — run `scaffold-screens` or mirror `principle/` into kebab folders
-3. **Locale** — add `strings_XX.json`, register in `StringManager`, add locale to `init.ts` `availableLocales`
-4. **Icon** — edit `public/icons/icon.svg`, run `npm run icons`; match theme color in `index.html` / `vite.config.ts`
-5. **Colors** — edit `*Colors.ts` (`default` + `projector` profiles per property)
-
-## Multi-screen sims
-
-Full guide: [`doc/multi-screen.md`](doc/multi-screen.md)
-
-Summary:
-- Prefer `npm run scaffold-screens -- --screens Intro,Lab` (add `--shared-model` for a root model)
-- Or create a screen folder mirroring `src/principle/` for each screen (kebab names, no `-screen` suffix)
-- Add screen-name keys to all locale JSON files; nest `a11y` per screen
-- Expose new getters in `StringManager.getScreenNames()` / `get{Screen}A11yStrings()`
-- Shared state: `--shared-model` → `common/model/SharedModel.ts` composed per screen (rename to a domain type)
-- Add `src/common/VernierScalesScreenIcons.ts` with `create{Screen}Icon()` factories; wire `homeScreenIcon` + `navigationBarIcon` on each Screen
-- Register all screens in the `screens` array in `main.ts`
-
-## Using this template beyond a direct copy
-
-| Approach | When to use |
-|---|---|
-| **`Baton/scripts/create-sim.sh`** | Agents / fleet — create repo, rename, scaffold N screens |
-| **GitHub template** ("Use this template") | Humans starting a sim in the browser |
-| `npm run rename` + `scaffold-screens` | Same, after cloning the template |
-| **npm workspace / monorepo** | Managing a suite of sims with shared tooling |
-| **git subtree** for pulling updates | Keeping forks in sync with template improvements |
-
-See `doc/multi-screen.md` → "Using this template beyond a direct copy" for details.
+`scaffold-screens` was a one-shot template script and has been removed. Add a screen by hand
+following [`doc/multi-screen.md`](doc/multi-screen.md) § "adding a second screen by hand": mirror an
+existing screen folder, add the screen-name and `a11y.<screen>` keys to all three locale files, add
+a `StringManager` getter, add an icon factory in `VernierScalesScreenIcons.ts`, and register it in
+`src/main.ts`.
 
 ## PWA
 

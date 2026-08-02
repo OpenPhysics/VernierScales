@@ -1,43 +1,45 @@
 /**
  * InstrumentsScreenView.ts
  *
- * The top-level view for the simulation screen.
+ * One instrument at a time — micrometer or bevel protractor — with the same
+ * scale views and readout the other screens use.
  *
- * All visual nodes are added here. Follow these conventions:
- *   - Use this.layoutBounds for positioning (never magic pixel values)
- *   - Keep a ResetAllButton that calls model.reset() and this.reset()
- *   - Override step(dt) for frame-by-frame animation
- *
- * ── Adding content ────────────────────────────────────────────────────────────
- * 1. Create Node subclasses in separate files (e.g. VernierScalesControlPanel.ts)
- * 2. Instantiate them here and call this.addChild(...)
- * 3. Link them to model properties:
- *      model.isRunningProperty.link( isRunning => { ... } );
- *
- * ── Layout bounds ─────────────────────────────────────────────────────────────
- * SceneryStack uses a virtual 1024×618 coordinate space by default.
- * this.layoutBounds gives you the full rectangle; use it for alignment:
- *   center, minX, maxX, minY, maxY, width, height
+ * Both instruments keep their own model, because their units differ. Only one is
+ * visible and only one is in the traversal order at a time, so the screen never
+ * offers a keyboard user a control for an instrument they cannot see.
  */
 
+import { DerivedProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { type EmptySelfOptions, optionize } from "scenerystack/phet-core";
-import { Node, Rectangle, Text } from "scenerystack/scenery";
-import { ResetAllButton } from "scenerystack/scenery-phet";
+import { Node, Text, VBox } from "scenerystack/scenery";
+import { PhetFont, ResetAllButton } from "scenerystack/scenery-phet";
 import { ScreenView, type ScreenViewOptions } from "scenerystack/sim";
+import { AquaRadioButtonGroup, Checkbox } from "scenerystack/sun";
 import { FLAT_RESET_ALL_BUTTON_OPTIONS } from "../../common/VernierScalesButtonOptions.js";
+import { VernierScalesPanel } from "../../common/VernierScalesPanel.js";
+import { ReadingReadoutNode } from "../../common/view/ReadingReadoutNode.js";
+import { ScaleViewsNode } from "../../common/view/ScaleViewsNode.js";
+import { StringManager } from "../../i18n/StringManager.js";
+import type { VernierScalesPreferencesModel } from "../../preferences/VernierScalesPreferencesModel.js";
 import VernierScalesColors from "../../VernierScalesColors.js";
-import { SCREEN_VIEW_MARGIN } from "../../VernierScalesConstants.js";
-import type { InstrumentsModel } from "../model/InstrumentsModel.js";
+import { CONTROL_PANEL_WIDTH, SCREEN_VIEW_MARGIN } from "../../VernierScalesConstants.js";
+import { ALL_INSTRUMENTS, Instrument, type InstrumentsModel } from "../model/InstrumentsModel.js";
 import { InstrumentsScreenSummaryContent } from "./InstrumentsScreenSummaryContent.js";
+import { MicrometerNode } from "./MicrometerNode.js";
+import { ProtractorNode } from "./ProtractorNode.js";
 
 export type InstrumentsScreenViewOptions = ScreenViewOptions;
 
+/** A control label in the panel's text colour. */
+const panelLabel = (stringProperty: TReadOnlyProperty<string>, size = 13): Text =>
+  new Text(stringProperty, { font: new PhetFont(size), fill: VernierScalesColors.textColorProperty });
+
 export class InstrumentsScreenView extends ScreenView {
-  public constructor(model: InstrumentsModel, providedOptions?: InstrumentsScreenViewOptions) {
-    // ── Accessibility: screen summary ───────────────────────────────────────────
-    // The screen summary is the first thing a screen-reader user encounters. It
-    // is registered here, in the ScreenView's super() options, so every sim wires
-    // it the same way. See InstrumentsScreenSummaryContent for the four content regions.
+  public constructor(
+    model: InstrumentsModel,
+    preferences: VernierScalesPreferencesModel,
+    providedOptions?: InstrumentsScreenViewOptions,
+  ) {
     const options = optionize<InstrumentsScreenViewOptions, EmptySelfOptions, ScreenViewOptions>()(
       {
         screenSummaryContent: new InstrumentsScreenSummaryContent(model),
@@ -46,42 +48,140 @@ export class InstrumentsScreenView extends ScreenView {
     );
     super(options);
 
-    // ── Background ────────────────────────────────────────────────────────────
-    // A full-screen rectangle that follows the active color profile.
-    // Replace or remove once you add real content.
-    const backgroundRect = new Rectangle(0, 0, this.layoutBounds.width, this.layoutBounds.height, {
-      fill: VernierScalesColors.backgroundColorProperty,
-    });
-    this.addChild(backgroundRect);
+    const strings = StringManager.getInstance().getInstrumentsStrings();
+    const common = StringManager.getInstance().getCommonStrings();
+    const a11y = StringManager.getInstance().getInstrumentsA11yStrings();
 
-    // ── Placeholder label ─────────────────────────────────────────────────────
-    // Replace this with your actual simulation content.
-    const placeholderText = new Text("Instruments", {
-      font: "bold 36px sans-serif",
+    const showingMicrometerProperty = new DerivedProperty(
+      [model.instrumentProperty],
+      (instrument) => instrument === Instrument.MICROMETER,
+    );
+    const showingProtractorProperty = new DerivedProperty(
+      [model.instrumentProperty],
+      (instrument) => instrument === Instrument.PROTRACTOR,
+    );
+
+    // ── The instruments ───────────────────────────────────────────────────────
+    const micrometerNode = new MicrometerNode(model.micrometer, {
+      x: 150,
+      y: 128,
+      visibleProperty: showingMicrometerProperty,
+    });
+    this.addChild(micrometerNode);
+
+    // The dial's centre is placed far below the screen so only the top of a very
+    // large circle is visible — the arc has to look like part of a real dial.
+    const protractorNode = new ProtractorNode(model.protractor, {
+      x: 390,
+      y: 660,
+      visibleProperty: showingProtractorProperty,
+    });
+    this.addChild(protractorNode);
+
+    // ── Scale views, one per instrument ───────────────────────────────────────
+    const micrometerScales = new ScaleViewsNode(model.micrometer, {
+      interactive: true,
+      magnifiedVisibleProperty: preferences.startMagnifiedProperty,
+      dragAccessibleName: a11y.controls.scaleStringProperty,
+      dragAccessibleHelpText: a11y.controls.scaleHelpStringProperty,
+      left: SCREEN_VIEW_MARGIN,
+      top: 226,
+      visibleProperty: showingMicrometerProperty,
+    });
+    this.addChild(micrometerScales);
+
+    const protractorScales = new ScaleViewsNode(model.protractor, {
+      interactive: true,
+      magnifiedVisibleProperty: preferences.startMagnifiedProperty,
+      dragAccessibleName: a11y.controls.scaleStringProperty,
+      dragAccessibleHelpText: a11y.controls.scaleHelpStringProperty,
+      left: SCREEN_VIEW_MARGIN,
+      top: 226,
+      visibleProperty: showingProtractorProperty,
+    });
+    this.addChild(protractorScales);
+
+    // ── Readouts ──────────────────────────────────────────────────────────────
+    const micrometerReadout = new ReadingReadoutNode(model.micrometer, {
+      showTrueValueProperty: model.showTrueValueProperty,
+      left: SCREEN_VIEW_MARGIN,
+      top: micrometerScales.bottom + 14,
+      visibleProperty: showingMicrometerProperty,
+    });
+    this.addChild(micrometerReadout);
+
+    const protractorReadout = new ReadingReadoutNode(model.protractor, {
+      showTrueValueProperty: model.showTrueValueProperty,
+      left: SCREEN_VIEW_MARGIN,
+      top: protractorScales.bottom + 14,
+      visibleProperty: showingProtractorProperty,
+    });
+    this.addChild(protractorReadout);
+
+    // ── Controls ──────────────────────────────────────────────────────────────
+    const instrumentLabels: Record<Instrument, TReadOnlyProperty<string>> = {
+      [Instrument.MICROMETER]: strings.names.micrometerStringProperty,
+      [Instrument.PROTRACTOR]: strings.names.protractorStringProperty,
+    };
+    const instrumentRadioGroup = new AquaRadioButtonGroup(
+      model.instrumentProperty,
+      ALL_INSTRUMENTS.map((instrument) => ({
+        value: instrument,
+        createNode: () => panelLabel(instrumentLabels[instrument]),
+      })),
+      {
+        orientation: "vertical",
+        align: "left",
+        spacing: 7,
+        accessibleName: a11y.controls.instrumentStringProperty,
+        radioButtonOptions: { radius: 8 },
+      },
+    );
+
+    const micrometerNote = new Text(strings.micrometerNoteStringProperty, {
+      font: new PhetFont(11),
       fill: VernierScalesColors.textColorProperty,
-      center: this.layoutBounds.center,
+      maxWidth: CONTROL_PANEL_WIDTH - 24,
+      visibleProperty: showingMicrometerProperty,
     });
-    this.addChild(placeholderText);
+    const protractorNote = new Text(strings.protractorNoteStringProperty, {
+      font: new PhetFont(11),
+      fill: VernierScalesColors.textColorProperty,
+      maxWidth: CONTROL_PANEL_WIDTH - 24,
+      visibleProperty: showingProtractorProperty,
+    });
 
-    // ── Accessibility: per-control names ────────────────────────────────────────
-    // EVERY interactive node must carry an `accessibleName` (and an
-    // `accessibleHelpText` where useful), sourced from the StringManager `a11y`
-    // string group — never a hard-coded English literal. Sun/scenery-phet controls
-    // (NumberControl, Checkbox, ComboBox, AquaRadioButtonGroup, …) accept it as an
-    // option; a draggable plain Node needs `tagName: "div", focusable: true` too.
-    // Example (uncomment and adapt when you add a real control):
-    //
-    //   const a11y = StringManager.getInstance().getInstrumentsA11yStrings();
-    //   const exampleButton = new RectangularPushButton({
-    //     ...FLAT_RECTANGULAR_BUTTON_OPTIONS, // flat appearance, not SceneryStack's default 3-D look
-    //     content: someIcon,
-    //     listener: () => model.doSomething(),
-    //     accessibleName: a11y.controls.exampleControlStringProperty,
-    //   });
-    //   this.addChild(exampleButton);
+    const showTrueValueCheckbox = new Checkbox(
+      model.showTrueValueProperty,
+      panelLabel(common.showTrueValueStringProperty),
+      {
+        accessibleName: a11y.controls.showTrueValueStringProperty,
+        checkboxColor: VernierScalesColors.textColorProperty,
+        checkboxColorBackground: VernierScalesColors.controlSurfaceColorProperty,
+        spacing: 8,
+      },
+    );
 
-    // ── Reset All button ──────────────────────────────────────────────────────
-    // Always position at bottom-right (PhET convention).
+    const controlPanel = new VernierScalesPanel(
+      new VBox({
+        align: "left",
+        spacing: 12,
+        children: [
+          panelLabel(strings.instrumentStringProperty, 14),
+          instrumentRadioGroup,
+          micrometerNote,
+          protractorNote,
+          showTrueValueCheckbox,
+        ],
+      }),
+      {
+        right: this.layoutBounds.maxX - SCREEN_VIEW_MARGIN,
+        top: 64,
+        minWidth: CONTROL_PANEL_WIDTH,
+      },
+    );
+    this.addChild(controlPanel);
+
     const resetAllButton = new ResetAllButton({
       ...FLAT_RESET_ALL_BUTTON_OPTIONS,
       listener: () => {
@@ -93,35 +193,22 @@ export class InstrumentsScreenView extends ScreenView {
     });
     this.addChild(resetAllButton);
 
-    // ── Accessibility: keyboard / reading traversal order ───────────────────────
-    // Make the parallel DOM (Tab order and screen-reader reading order)
-    // deterministic and independent of child z-order. ScreenView throws if you
-    // set pdomOrder on itself, so add a lightweight wrapper Node that "borrows"
-    // the interactive nodes in the order a user should reach them — Reset All
-    // last. Non-interactive decoration (background, placeholder) is omitted.
+    // Both instruments' scale views appear in the order, but an invisible node is
+    // skipped by the PDOM, so only the active one is ever reachable.
     this.addChild(
       new Node({
         pdomOrder: [
-          // TODO: add the sim's interactive nodes here, in traversal order
+          micrometerScales.dragTarget,
+          protractorScales.dragTarget,
+          instrumentRadioGroup,
+          showTrueValueCheckbox,
           resetAllButton,
         ],
       }),
     );
   }
 
-  /**
-   * Resets view-side state (animations, panel visibility, etc.).
-   * Called by the Reset All button listener.
-   */
   public reset(): void {
-    // TODO: reset any view-side state here
-  }
-
-  /**
-   * Steps the view forward by dt seconds for animation.
-   * @param _dt - elapsed time in seconds
-   */
-  public override step(_dt: number): void {
-    // TODO: implement animation updates here
+    // No view-side state to reset; everything on screen derives from the model.
   }
 }

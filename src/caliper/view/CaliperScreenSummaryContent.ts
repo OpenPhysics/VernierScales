@@ -1,38 +1,61 @@
 /**
  * CaliperScreenSummaryContent.ts
  *
- * The accessible screen summary read by screen readers (SceneryStack's
- * Interactive Description). It appears at the top of the parallel DOM and gives
- * a non-visual user a way to orient themselves and to re-read the simulation's
- * current state at any time.
+ * The accessible screen summary for the Caliper screen.
  *
- * A summary has four regions (all optional, but provide at least the first
- * three in every sim for consistency across OpenPhysics):
- *   - playAreaContent       — what the play area contains
- *   - controlAreaContent    — what the controls do
- *   - currentDetailsContent — a LIVE paragraph describing current state
- *   - interactionHintContent — a short hint on how to get started
- *
- * ── Making "current details" live ─────────────────────────────────────────────
- * The template has no model state, so currentDetails is a static string. In a
- * real sim, build a DerivedProperty over the relevant model Properties and pass
- * it as `currentDetailsContent` so the paragraph updates as the sim runs.
- * See LunarLander/src/.../LunarLanderScreenSummaryContent.ts for the pattern.
+ * The live paragraph names the jaws in use, the scale fitted, and the two
+ * numbers that make up the reading. Coincidence cannot be seen without sight, so
+ * saying which line coincides is not a courtesy here — it is the measurement.
  */
+
+import { DerivedProperty, PatternStringProperty } from "scenerystack/axon";
 import { ScreenSummaryContent } from "scenerystack/sim";
+import {
+  createMainPartStringProperty,
+  createReadingStringProperty,
+  createScaleNameProperty,
+} from "../../common/view/readingProperties.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { CaliperModel } from "../model/CaliperModel.js";
+import { MeasurementMode } from "../model/CaliperModel.js";
 
 export class CaliperScreenSummaryContent extends ScreenSummaryContent {
-  // `model` is unused in the template but kept in the signature so real sims can
-  // derive a live currentDetailsContent from it without changing call sites.
-  public constructor(_model: CaliperModel) {
+  public constructor(model: CaliperModel) {
     const a11y = StringManager.getInstance().getCaliperA11yStrings();
+    const modes = StringManager.getInstance().getCaliperStrings().modes;
+
+    const modeNameProperty = new DerivedProperty(
+      [
+        model.measurementModeProperty,
+        modes.outsideStringProperty,
+        modes.insideStringProperty,
+        modes.depthStringProperty,
+        modes.stepStringProperty,
+      ],
+      (mode, outside, inside, depth, step) => {
+        switch (mode) {
+          case MeasurementMode.OUTSIDE:
+            return outside;
+          case MeasurementMode.INSIDE:
+            return inside;
+          case MeasurementMode.DEPTH:
+            return depth;
+          case MeasurementMode.STEP:
+            return step;
+        }
+      },
+    );
 
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
       controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: a11y.currentDetailsStringProperty,
+      currentDetailsContent: new PatternStringProperty(a11y.currentDetailsStringProperty, {
+        mode: modeNameProperty,
+        scale: createScaleNameProperty(model.scale.specProperty),
+        main: createMainPartStringProperty(model.scale.mainDivisionsReadProperty, model.scale.specProperty),
+        index: model.scale.vernierLabelReadProperty,
+        reading: createReadingStringProperty(model.scale.readingTicksProperty, model.scale.specProperty),
+      }),
       interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
     });
   }

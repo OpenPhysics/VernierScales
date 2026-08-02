@@ -2,9 +2,8 @@
  * PracticeKeyboardHelpContent.ts
  *
  * Content for the keyboard-help dialog (the "?" button in the navigation bar).
- * The template's only interactions are buttons and Reset All, so a single
- * basic-actions section covers the available keyboard controls. Add a slider or
- * combo-box section here as the simulation grows.
+ * This screen has no draggable vernier — the instrument is set for you to read —
+ * so the standard actions are the whole story.
  */
 
 import { BasicActionsKeyboardHelpSection, TwoColumnKeyboardHelpContent } from "scenerystack/scenery-phet";

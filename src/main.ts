@@ -37,22 +37,22 @@ onReadyToLaunch(() => {
   const simPreferences = new VernierScalesPreferencesModel(Tandem.ROOT.createTandem("preferences"));
 
   const screens = [
-    new VernierPrincipleScreen({
+    new VernierPrincipleScreen(simPreferences, {
       name: stringManager.getScreenNames().principleStringProperty,
       tandem: Tandem.ROOT.createTandem("principleScreen"),
       backgroundColorProperty: VernierScalesColors.backgroundColorProperty,
     }),
-    new CaliperScreen({
+    new CaliperScreen(simPreferences, {
       name: stringManager.getScreenNames().caliperStringProperty,
       tandem: Tandem.ROOT.createTandem("caliperScreen"),
       backgroundColorProperty: VernierScalesColors.backgroundColorProperty,
     }),
-    new InstrumentsScreen({
+    new InstrumentsScreen(simPreferences, {
       name: stringManager.getScreenNames().instrumentsStringProperty,
       tandem: Tandem.ROOT.createTandem("instrumentsScreen"),
       backgroundColorProperty: VernierScalesColors.backgroundColorProperty,
     }),
-    new PracticeScreen({
+    new PracticeScreen(simPreferences, {
       name: stringManager.getScreenNames().practiceStringProperty,
       tandem: Tandem.ROOT.createTandem("practiceScreen"),
       backgroundColorProperty: VernierScalesColors.backgroundColorProperty,

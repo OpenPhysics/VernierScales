@@ -1,59 +1,176 @@
 {
-  "title": "Vernier Scales",
+  "title": "Échelles à vernier",
   "screens": {
-    "principle": "Vernier Principle",
-    "caliper": "Caliper",
+    "principle": "Principe du vernier",
+    "caliper": "Pied à coulisse",
     "instruments": "Instruments",
-    "practice": "Practice"
+    "practice": "Exercices"
+  },
+  "common": {
+    "reading": "Lecture",
+    "trueValue": "Valeur vraie",
+    "readingError": "Erreur de lecture",
+    "leastCount": "Résolution",
+    "mainScale": "Règle principale",
+    "vernierScale": "Vernier",
+    "magnified": "Vue agrandie",
+    "showTrueValue": "Afficher la valeur vraie",
+    "coincidentLine": "Trait coïncidant",
+    "readingPattern": "{{main}} + {{index}} × {{leastCount}} = {{reading}}",
+    "valuePattern": "{{value}} {{unit}}",
+    "errorPattern": "{{value}} ({{percent}} d’une résolution)",
+    "divisionsPattern": "{{count}} divisions",
+    "scales": {
+      "metricTenth": "Métrique, 0,1 mm",
+      "metricTwentieth": "Métrique, 0,05 mm",
+      "metricFiftieth": "Métrique, 0,02 mm",
+      "metricHalfMillimetre": "Métrique, 0,025 mm",
+      "inchThou": "Pouce, 0,001 in",
+      "inchHalfThou": "Pouce, 0,0005 in",
+      "inch128": "Pouce, 1/128 in",
+      "inch64": "Pouce, 1/64 in",
+      "protractorFiveMinute": "Rapporteur, 5 minutes d'arc",
+      "micrometerMicron": "Micromètre, 0,001 mm"
+    },
+    "vernierTypes": {
+      "direct": "Direct",
+      "retrograde": "Rétrograde",
+      "extended": "Étendu"
+    },
+    "labelPattern": "{{label}} : {{value}}"
+  },
+  "principle": {
+    "geometry": "Géométrie du vernier",
+    "divisions": "Divisions du vernier",
+    "mainDivision": "Division principale",
+    "vernierDivision": "Division du vernier",
+    "spanPattern": "{{count}} divisions du vernier couvrent {{span}} divisions principales",
+    "showCoincidence": "Marquer le trait coïncidant",
+    "directDescription": "Chaque division du vernier est plus courte d'une résolution qu'une division principale.",
+    "retrogradeDescription": "Chaque division du vernier est plus longue d'une résolution, d'où la numérotation inversée.",
+    "extendedDescription": "Chaque division du vernier fait une résolution de moins que deux divisions principales, ce qui espace les traits."
+  },
+  "caliper": {
+    "scale": "Échelle du pied à coulisse",
+    "measurementMode": "Mesure avec",
+    "modes": {
+      "outside": "Becs extérieurs",
+      "inside": "Becs intérieurs",
+      "depth": "Jauge de profondeur",
+      "step": "Faces de ressaut"
+    },
+    "zeroError": "Erreur de zéro",
+    "snapToReadable": "Aligner sur les valeurs lisibles",
+    "rawReading": "L'échelle indique",
+    "correctedReading": "Corrigée",
+    "zeroErrorHint": "Un pied à coulisse qui n'indique pas zéro une fois fermé fausse toutes les longueurs de la même quantité."
+  },
+  "instruments": {
+    "instrument": "Instrument",
+    "names": {
+      "micrometer": "Micromètre à vernier",
+      "protractor": "Rapporteur d'angle"
+    },
+    "thimble": "Tambour",
+    "blade": "Angle de la lame",
+    "micrometerNote": "Le vernier de la douille divise le tambour de 0,01 mm en dix parties.",
+    "protractorNote": "Douze divisions du vernier couvrent 23 degrés : la résolution est de cinq minutes d'arc."
+  },
+  "practice": {
+    "level": "Type de question",
+    "levels": {
+      "metric": "Métrique",
+      "imperial": "Impérial",
+      "zeroError": "Avec erreur de zéro"
+    },
+    "prompt": "Que lit l'instrument ?",
+    "yourAnswer": "Votre réponse",
+    "check": "Vérifier",
+    "newQuestion": "Nouvelle question",
+    "correct": "Correct.",
+    "incorrect": "Pas tout à fait — regardez de nouveau quel trait coïncide.",
+    "unparseable": "Ce n'est pas une lecture que cet instrument peut donner.",
+    "revealPattern": "La lecture est {{reading}}.",
+    "tallyPattern": "{{correct}} bonnes réponses sur {{asked}}",
+    "fractionHint": "Écrivez les fractions ainsi : 1 37/128.",
+    "zeroErrorPrompt": "Corrigez l'erreur de zéro, puis saisissez la mesure vraie."
   },
   "a11y": {
     "principle": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "Une règle principale traverse la zone de jeu, avec un vernier qui coulisse en dessous. Une vue agrandie montre la région autour du trait où les deux échelles coïncident.",
+        "controlArea": "La zone de contrôle règle le nombre de divisions du vernier et laquelle des trois géométries il utilise, et comporte un bouton Tout réinitialiser.",
+        "interactionHint": "Déplacez le vernier le long de la règle et observez quel trait s'aligne."
       },
-      "currentDetails": "La simulation est dans son état initial.",
+      "currentDetails": "Le vernier a {{divisions}} divisions, donc la résolution vaut {{leastCount}}. Le zéro du vernier dépasse {{main}}, le trait {{index}} coïncide, et la lecture est {{reading}}.",
       "controls": {
-        "exampleControl": "Contrôle d'exemple"
+        "vernier": "Position du vernier",
+        "vernierHelp": "Les flèches droite et gauche déplacent le vernier d'une résolution. Page précédente et Page suivante le déplacent d'une division principale.",
+        "divisions": "Nombre de divisions du vernier",
+        "vernierType": "Géométrie du vernier",
+        "showCoincidence": "Marquer le trait coïncidant"
       }
     },
     "caliper": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "Un pied à coulisse tient une pièce entre ses becs. En dessous, ses échelles sont montrées sur toute la largeur, avec une vue agrandie de la région du trait coïncidant.",
+        "controlArea": "La zone de contrôle choisit l'échelle du pied à coulisse et les becs utilisés, règle une erreur de zéro, et comporte un bouton Tout réinitialiser.",
+        "interactionHint": "Déplacez les becs et lisez la mesure sur les deux échelles."
       },
-      "currentDetails": "La simulation est dans son état initial.",
+      "currentDetails": "Mesure avec {{mode}} sur l'échelle {{scale}}. La règle principale dépasse {{main}}, le trait {{index}} coïncide, et la mesure est {{reading}}.",
       "controls": {
-        "exampleControl": "Contrôle d'exemple"
+        "jaws": "Becs du pied à coulisse",
+        "jawsHelp": "Les flèches droite et gauche ouvrent et ferment les becs d'une résolution. Page précédente et Page suivante les déplacent d'une division principale.",
+        "scale": "Échelle du pied à coulisse",
+        "measurementMode": "Mesure avec",
+        "zeroError": "Erreur de zéro, en résolutions",
+        "showTrueValue": "Afficher la valeur vraie",
+        "snapToReadable": "Aligner sur les valeurs lisibles"
       }
     },
     "instruments": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "Un instrument autre qu'un pied à coulisse est montré avec son vernier : soit un micromètre, dont le vernier lit un tambour rotatif, soit un rapporteur, dont l'échelle est un cercle.",
+        "controlArea": "La zone de contrôle choisit l'instrument et comporte un bouton Tout réinitialiser.",
+        "interactionHint": "Déplacez l'échelle de l'instrument et lisez-la comme un pied à coulisse."
       },
-      "currentDetails": "La simulation est dans son état initial.",
+      "currentDetails": "Le {{instrument}} dépasse {{main}}, le trait {{index}} coïncide, et la lecture est {{reading}}.",
       "controls": {
-        "exampleControl": "Contrôle d'exemple"
+        "instrument": "Instrument",
+        "scale": "Échelle de l'instrument",
+        "scaleHelp": "Les flèches droite et gauche déplacent l'échelle d'une résolution. Page précédente et Page suivante la déplacent d'une division principale.",
+        "showTrueValue": "Afficher la valeur vraie"
       }
     },
     "practice": {
       "screenSummary": {
-        "playArea": "La zone de jeu affiche le contenu principal de la simulation.",
-        "controlArea": "La zone de contrôle comporte un bouton Tout réinitialiser qui ramène la simulation à son état initial.",
-        "interactionHint": "Explorez la simulation en interagissant avec ses commandes."
+        "playArea": "Un instrument est réglé sur une valeur à lire, montré sur toute la largeur avec une vue agrandie du trait coïncidant en dessous.",
+        "controlArea": "La zone de contrôle comporte un champ de réponse, un bouton Vérifier, un bouton Nouvelle question, un sélecteur de type de question et un bouton Tout réinitialiser.",
+        "interactionHint": "Lisez l'instrument, saisissez ce qu'il indique, et vérifiez votre réponse."
       },
-      "currentDetails": "La simulation est dans son état initial.",
+      "currentDetails": "Question {{asked}} sur l'échelle {{scale}}. {{tally}}.",
       "controls": {
-        "exampleControl": "Contrôle d'exemple"
+        "answer": "Votre réponse",
+        "answerHelp": "Saisissez la lecture, puis activez le bouton Vérifier.",
+        "check": "Vérifier la réponse",
+        "newQuestion": "Poser une nouvelle question",
+        "level": "Type de question"
+      },
+      "responses": {
+        "correct": "Correct. La lecture est {{reading}}.",
+        "incorrect": "Incorrect. Regardez de nouveau quel trait du vernier coïncide.",
+        "unparseable": "Ce n'est pas une lecture que cet instrument peut donner."
       }
     }
   },
   "preferences": {
     "title": "Simulation",
-    "exampleToggle": "Exemple de bascule"
+    "startMagnified": "Afficher la vue agrandie au démarrage"
+  },
+  "keyboardHelp": {
+    "title": "Déplacer le vernier",
+    "leastCount": "Déplacer d’une résolution",
+    "mainDivision": "Déplacer d’une division principale",
+    "ends": "Aller à zéro ou en fin de course"
   }
 }

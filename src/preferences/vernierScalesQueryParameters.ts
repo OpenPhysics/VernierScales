@@ -11,7 +11,7 @@
  * 2. If it should also be user-editable at runtime, surface it as a preference
  *    in VernierScalesPreferencesModel (initialize that Property from this query parameter).
  *
- * Usage: append e.g. `?exampleToggle=true` to the sim URL.
+ * Usage: append e.g. `?startMagnified=false` to the sim URL.
  */
 
 import { logGlobal } from "scenerystack/phet-core";
@@ -20,12 +20,13 @@ import VernierScalesNamespace from "../VernierScalesNamespace.js";
 
 const vernierScalesQueryParameters = QueryStringMachine.getAll({
   /**
-   * Example public boolean parameter. Replace with real sim-specific parameters,
-   * or remove if the sim has none.
+   * Whether the magnified view of the coincidence starts visible. Turning it off
+   * makes the sim harder on purpose: the whole vernier is still there to read,
+   * just without the close-up confirmation.
    */
-  exampleToggle: {
+  startMagnified: {
     type: "boolean",
-    defaultValue: false,
+    defaultValue: true,
     public: true,
   },
 });

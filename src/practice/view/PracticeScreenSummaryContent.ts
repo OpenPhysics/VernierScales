@@ -1,38 +1,36 @@
 /**
  * PracticeScreenSummaryContent.ts
  *
- * The accessible screen summary read by screen readers (SceneryStack's
- * Interactive Description). It appears at the top of the parallel DOM and gives
- * a non-visual user a way to orient themselves and to re-read the simulation's
- * current state at any time.
+ * The accessible screen summary for the Practice screen.
  *
- * A summary has four regions (all optional, but provide at least the first
- * three in every sim for consistency across OpenPhysics):
- *   - playAreaContent       — what the play area contains
- *   - controlAreaContent    — what the controls do
- *   - currentDetailsContent — a LIVE paragraph describing current state
- *   - interactionHintContent — a short hint on how to get started
- *
- * ── Making "current details" live ─────────────────────────────────────────────
- * The template has no model state, so currentDetails is a static string. In a
- * real sim, build a DerivedProperty over the relevant model Properties and pass
- * it as `currentDetailsContent` so the paragraph updates as the sim runs.
- * See LunarLander/src/.../LunarLanderScreenSummaryContent.ts for the pattern.
+ * Note what it does *not* say: the reading. The summary names the question, the
+ * scale and the tally, because a screen-reader user needs to know where they are
+ * — but reading the instrument is the exercise, and the live description is the
+ * one place it would be trivial to give the answer away.
  */
+
+import { PatternStringProperty } from "scenerystack/axon";
 import { ScreenSummaryContent } from "scenerystack/sim";
+import { createScaleNameProperty } from "../../common/view/readingProperties.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import type { PracticeModel } from "../model/PracticeModel.js";
 
 export class PracticeScreenSummaryContent extends ScreenSummaryContent {
-  // `model` is unused in the template but kept in the signature so real sims can
-  // derive a live currentDetailsContent from it without changing call sites.
-  public constructor(_model: PracticeModel) {
+  public constructor(model: PracticeModel) {
     const a11y = StringManager.getInstance().getPracticeA11yStrings();
+    const strings = StringManager.getInstance().getPracticeStrings();
 
     super({
       playAreaContent: a11y.screenSummary.playAreaStringProperty,
       controlAreaContent: a11y.screenSummary.controlAreaStringProperty,
-      currentDetailsContent: a11y.currentDetailsStringProperty,
+      currentDetailsContent: new PatternStringProperty(a11y.currentDetailsStringProperty, {
+        asked: model.askedCountProperty,
+        scale: createScaleNameProperty(model.scale.specProperty),
+        tally: new PatternStringProperty(strings.tallyPatternStringProperty, {
+          correct: model.correctCountProperty,
+          asked: model.askedCountProperty,
+        }),
+      }),
       interactionHintContent: a11y.screenSummary.interactionHintStringProperty,
     });
   }

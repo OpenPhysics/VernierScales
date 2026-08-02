@@ -11,11 +11,14 @@
   },
   "keywords": [
     "simulation",
-    "SceneryStack",
-    "interactive",
     "physics",
-    "education",
-    "pwa"
+    "metrology",
+    "vernier",
+    "caliper",
+    "micrometer",
+    "measurement",
+    "scenerystack",
+    "education"
   ],
   "scripts": {
     "start": "vite",
@@ -34,8 +37,6 @@
     "test:fuzz": "playwright test --project=chromium",
     "test:fuzz:quick": "FUZZ_DURATION=10 playwright test --project=chromium",
     "icons": "tsx scripts/generate-icons.ts",
-    "rename": "tsx scripts/rename-sim.ts",
-    "scaffold-screens": "tsx scripts/scaffold-screens.ts",
     "clean": "rm -rf dist",
     "prepare": "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },

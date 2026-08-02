@@ -6,54 +6,171 @@
     "instruments": "Instruments",
     "practice": "Practice"
   },
+  "common": {
+    "reading": "Reading",
+    "trueValue": "True value",
+    "readingError": "Reading error",
+    "leastCount": "Least count",
+    "mainScale": "Main scale",
+    "vernierScale": "Vernier",
+    "magnified": "Magnified view",
+    "showTrueValue": "Show true value",
+    "coincidentLine": "Coincident line",
+    "readingPattern": "{{main}} + {{index}} × {{leastCount}} = {{reading}}",
+    "valuePattern": "{{value}} {{unit}}",
+    "errorPattern": "{{value}} ({{percent}} of a least count)",
+    "divisionsPattern": "{{count}} divisions",
+    "scales": {
+      "metricTenth": "Metric, 0.1 mm",
+      "metricTwentieth": "Metric, 0.05 mm",
+      "metricFiftieth": "Metric, 0.02 mm",
+      "metricHalfMillimetre": "Metric, 0.025 mm",
+      "inchThou": "Inch, 0.001 in",
+      "inchHalfThou": "Inch, 0.0005 in",
+      "inch128": "Inch, 1/128 in",
+      "inch64": "Inch, 1/64 in",
+      "protractorFiveMinute": "Protractor, 5 arcmin",
+      "micrometerMicron": "Micrometer, 0.001 mm"
+    },
+    "vernierTypes": {
+      "direct": "Direct",
+      "retrograde": "Retrograde",
+      "extended": "Extended"
+    },
+    "labelPattern": "{{label}}: {{value}}"
+  },
+  "principle": {
+    "geometry": "Vernier geometry",
+    "divisions": "Vernier divisions",
+    "mainDivision": "Main division",
+    "vernierDivision": "Vernier division",
+    "spanPattern": "{{count}} vernier divisions span {{span}} main divisions",
+    "showCoincidence": "Mark the coincident line",
+    "directDescription": "Each vernier division is one least count shorter than a main division.",
+    "retrogradeDescription": "Each vernier division is one least count longer, so the numbering runs backwards.",
+    "extendedDescription": "Each vernier division is one least count short of two main divisions, spreading the marks out."
+  },
+  "caliper": {
+    "scale": "Caliper scale",
+    "measurementMode": "Measuring with",
+    "modes": {
+      "outside": "Outside jaws",
+      "inside": "Inside jaws",
+      "depth": "Depth rod",
+      "step": "Step faces"
+    },
+    "zeroError": "Zero error",
+    "snapToReadable": "Snap to readable values",
+    "rawReading": "Scale reads",
+    "correctedReading": "Corrected",
+    "zeroErrorHint": "A caliper that does not read zero when closed reports every length wrong by the same amount."
+  },
+  "instruments": {
+    "instrument": "Instrument",
+    "names": {
+      "micrometer": "Vernier micrometer",
+      "protractor": "Bevel protractor"
+    },
+    "thimble": "Thimble",
+    "blade": "Blade angle",
+    "micrometerNote": "The sleeve vernier resolves the 0.01 mm thimble into ten parts.",
+    "protractorNote": "Twelve vernier divisions span 23 degrees, so the least count is five arcminutes."
+  },
+  "practice": {
+    "level": "Question type",
+    "levels": {
+      "metric": "Metric",
+      "imperial": "Imperial",
+      "zeroError": "With zero error"
+    },
+    "prompt": "What does the instrument read?",
+    "yourAnswer": "Your answer",
+    "check": "Check",
+    "newQuestion": "New question",
+    "correct": "Correct.",
+    "incorrect": "Not quite — look again at which line coincides.",
+    "unparseable": "That is not a reading this instrument can give.",
+    "revealPattern": "The reading is {{reading}}.",
+    "tallyPattern": "{{correct}} correct of {{asked}}",
+    "fractionHint": "Write fractions like 1 37/128.",
+    "zeroErrorPrompt": "Correct for the zero error, then type the true measurement."
+  },
   "a11y": {
     "principle": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "A main scale runs across the play area with a vernier scale sliding beneath it. A magnified view below shows the region around the line where the two scales coincide.",
+        "controlArea": "The control area sets how many divisions the vernier has and which of the three vernier geometries it uses, and has a Reset All button.",
+        "interactionHint": "Move the vernier along the main scale and watch which vernier line comes into alignment."
       },
-      "currentDetails": "The simulation is in its initial state.",
+      "currentDetails": "The vernier has {{divisions}} divisions, so one least count is {{leastCount}}. The vernier zero sits past {{main}}, vernier line {{index}} coincides, and the reading is {{reading}}.",
       "controls": {
-        "exampleControl": "Example control"
+        "vernier": "Vernier scale position",
+        "vernierHelp": "Right and left arrows move the vernier one least count. Page Up and Page Down move it one main division.",
+        "divisions": "Number of vernier divisions",
+        "vernierType": "Vernier geometry",
+        "showCoincidence": "Mark the coincident line"
       }
     },
     "caliper": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "A vernier caliper holds a workpiece between its jaws. Below it, the caliper's scales are shown full width, with a magnified view of the region around the coinciding line.",
+        "controlArea": "The control area chooses the caliper's scale and which jaws are measuring, sets a zero error, and has a Reset All button.",
+        "interactionHint": "Move the jaws and read the measurement off the two scales."
       },
-      "currentDetails": "The simulation is in its initial state.",
+      "currentDetails": "Measuring with the {{mode}} on the {{scale}} scale. The main scale reads past {{main}}, vernier line {{index}} coincides, and the measurement is {{reading}}.",
       "controls": {
-        "exampleControl": "Example control"
+        "jaws": "Caliper jaws",
+        "jawsHelp": "Right and left arrows open and close the jaws by one least count. Page Up and Page Down move them one main division.",
+        "scale": "Caliper scale",
+        "measurementMode": "Measuring with",
+        "zeroError": "Zero error, in least counts",
+        "showTrueValue": "Show true value",
+        "snapToReadable": "Snap to readable values"
       }
     },
     "instruments": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "An instrument other than a caliper is shown with its vernier scale: either a micrometer, whose vernier reads a rotating thimble, or a bevel protractor, whose scale is a circle.",
+        "controlArea": "The control area chooses the instrument and has a Reset All button.",
+        "interactionHint": "Move the instrument's scale and read it the same way you read a caliper."
       },
-      "currentDetails": "The simulation is in its initial state.",
+      "currentDetails": "The {{instrument}} reads past {{main}}, vernier line {{index}} coincides, and the reading is {{reading}}.",
       "controls": {
-        "exampleControl": "Example control"
+        "instrument": "Instrument",
+        "scale": "Instrument scale",
+        "scaleHelp": "Right and left arrows move the scale one least count. Page Up and Page Down move it one main division.",
+        "showTrueValue": "Show true value"
       }
     },
     "practice": {
       "screenSummary": {
-        "playArea": "The play area shows the main simulation content.",
-        "controlArea": "The control area has a Reset All button that returns the simulation to its starting state.",
-        "interactionHint": "Explore the simulation by interacting with its controls."
+        "playArea": "An instrument is set to a value for you to read, shown full width with a magnified view of the coinciding line beneath it.",
+        "controlArea": "The control area has a field for your answer, a Check button, a New question button, a question type selector, and a Reset All button.",
+        "interactionHint": "Read the instrument, type what it says, and check your answer."
       },
-      "currentDetails": "The simulation is in its initial state.",
+      "currentDetails": "Question {{asked}} on the {{scale}} scale. {{tally}}.",
       "controls": {
-        "exampleControl": "Example control"
+        "answer": "Your answer",
+        "answerHelp": "Type the reading, then activate the Check button.",
+        "check": "Check the answer",
+        "newQuestion": "Ask a new question",
+        "level": "Question type"
+      },
+      "responses": {
+        "correct": "Correct. The reading is {{reading}}.",
+        "incorrect": "Not correct. Look again at which vernier line coincides.",
+        "unparseable": "That is not a reading this instrument can give."
       }
     }
   },
   "preferences": {
     "title": "Simulation",
-    "exampleToggle": "Example Toggle"
+    "startMagnified": "Start with the magnified view shown"
+  },
+  "keyboardHelp": {
+    "title": "Move the Vernier",
+    "leastCount": "Move by one least count",
+    "mainDivision": "Move by one main division",
+    "ends": "Jump to zero or to full scale"
   }
 }

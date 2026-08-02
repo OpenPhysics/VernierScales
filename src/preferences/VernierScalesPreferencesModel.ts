@@ -5,8 +5,8 @@
  * Simulation. Each preference Property takes its initial value from the
  * corresponding query parameter in vernierScalesQueryParameters.
  *
- * Remove the example preference (and its query parameter / UI control) if the
- * sim has no sim-specific preferences.
+ * The sim has one preference: whether the magnified view of the coincidence
+ * starts visible.
  */
 
 import { BooleanProperty } from "scenerystack/axon";
@@ -15,18 +15,18 @@ import VernierScalesNamespace from "../VernierScalesNamespace.js";
 import vernierScalesQueryParameters from "./vernierScalesQueryParameters.js";
 
 export class VernierScalesPreferencesModel {
-  /** Example preference; initial value comes from the `exampleToggle` query parameter. */
-  public readonly exampleToggleProperty: BooleanProperty;
+  /** Whether the magnified view starts visible; initial value from `startMagnified`. */
+  public readonly startMagnifiedProperty: BooleanProperty;
 
   public constructor(tandem?: Tandem) {
-    this.exampleToggleProperty = new BooleanProperty(
-      vernierScalesQueryParameters.exampleToggle,
-      tandem ? { tandem: tandem.createTandem("exampleToggleProperty") } : undefined,
+    this.startMagnifiedProperty = new BooleanProperty(
+      vernierScalesQueryParameters.startMagnified,
+      tandem ? { tandem: tandem.createTandem("startMagnifiedProperty") } : undefined,
     );
   }
 
   public reset(): void {
-    this.exampleToggleProperty.reset();
+    this.startMagnifiedProperty.reset();
   }
 }
 
