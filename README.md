@@ -6,23 +6,24 @@ general — built with [SceneryStack](https://scenerystack.org/), Vite 8, TypeSc
 A vernier scale reads a fraction of a division by sliding a second scale, whose divisions are
 slightly a different size, against the first. Only one pair of lines ever coincides, and which pair
 it is gives you the fraction. This sim takes that one idea and follows it from bare scales to real
-instruments.
+instruments. The physics and the reading procedure are written up for teachers in
+[`doc/model.md`](doc/model.md).
 
-## Screens
+## Features
 
-| Screen | What it does |
-|---|---|
-| **Vernier Principle** | Two bare scales. Choose direct, retrograde or extended geometry and any number of divisions, slide the vernier, and watch the coincidence move. |
-| **Caliper** | A caliper measuring a workpiece with its outside jaws, inside jaws, depth rod or step faces, at five different scales, with an optional zero error and a true-value readout. |
-| **Instruments** | A vernier micrometer, whose vernier reads a rotating thimble, and a bevel protractor, whose scale is a circle and whose least count is five arcminutes. |
-| **Practice** | A drill: the instrument is set, you read it and type the answer. Metric, imperial, and a tier where the tool is miscalibrated. |
+Four screens:
+
+- **Vernier Principle** — two bare scales. Choose direct, retrograde or extended geometry and any
+  number of divisions, slide the vernier, and watch the coincidence move.
+- **Caliper** — a caliper measuring a workpiece with its outside jaws, inside jaws, depth rod or
+  step faces, at five different scales, with an optional zero error and a true-value readout.
+- **Instruments** — a vernier micrometer (vernier on a rotating thimble) and a bevel protractor
+  (circular scale, least count five arcminutes).
+- **Practice** — a drill: the instrument is set, you read it and type the answer. Metric, imperial,
+  and a tier where the tool is miscalibrated.
 
 Imperial is covered properly: decimal-inch calipers reading 0.001 in and 0.0005 in, and
 fractional-inch ones reading 1/128 in and 1/64 in whose answers are reduced mixed fractions.
-
-The physics and the reading procedure are written up for teachers in [`doc/model.md`](doc/model.md).
-
-## Features
 
 - Every reading shown as its decomposition — main-scale part, coincident line, least count — not
   just as a finished number
