@@ -58,17 +58,18 @@ export class CaliperModel implements TModel {
   /** Which jaws are in use. */
   public readonly measurementModeProperty = new Property<MeasurementMode>(MeasurementMode.OUTSIDE);
 
-  /** Whether to reveal the true size alongside the reading, exposing the resolution error. */
-  public readonly showTrueValueProperty = new Property(false);
-
-  /** Whether the jaws snap to exactly readable sizes, for uncluttered practice. */
-  public readonly snapToReadableProperty = new Property(false);
+  /**
+   * Whether the jaws snap to exactly readable sizes. Lives on the scale so that
+   * every `setMeasurement` call — jaw drag, scale drag, keyboard — honours it.
+   */
+  public readonly snapToReadableProperty: Property<boolean>;
 
   /** Size of each dimension of the workpiece, in millimetres. */
   private readonly dimensionProperties: Record<MeasurementMode, NumberProperty>;
 
   public constructor() {
     this.scale = new VernierScaleModel(METRIC_FIFTIETH, INITIAL_DIMENSIONS_MM[MeasurementMode.OUTSIDE]);
+    this.snapToReadableProperty = this.scale.snapToReadableEnabledProperty;
 
     this.dimensionProperties = {
       [MeasurementMode.OUTSIDE]: new NumberProperty(INITIAL_DIMENSIONS_MM[MeasurementMode.OUTSIDE]),
@@ -86,27 +87,11 @@ export class CaliperModel implements TModel {
     this.scale.measurementProperty.lazyLink((measurement) => {
       this.dimensionProperties[this.measurementModeProperty.value].value = measurement;
     });
-
-    // Snapping is a display-time convenience, but it has to bite on the model or
-    // the readout and the drawn jaws would disagree.
-    this.snapToReadableProperty.lazyLink((snap) => {
-      if (snap) {
-        this.scale.snapToReadable();
-      }
-    });
   }
 
   /** The dimension currently under the jaws, in millimetres. */
   public get activeDimension(): number {
     return this.dimensionProperties[this.measurementModeProperty.value].value;
-  }
-
-  /** Move the jaws, honouring the snap-to-readable setting. */
-  public setMeasurement(canonicalValue: number): void {
-    this.scale.setMeasurement(canonicalValue);
-    if (this.snapToReadableProperty.value) {
-      this.scale.snapToReadable();
-    }
   }
 
   /** The scale presets this screen offers. */
@@ -116,7 +101,6 @@ export class CaliperModel implements TModel {
 
   public reset(): void {
     this.measurementModeProperty.reset();
-    this.showTrueValueProperty.reset();
     this.snapToReadableProperty.reset();
     for (const mode of ALL_MEASUREMENT_MODES) {
       this.dimensionProperties[mode].reset();

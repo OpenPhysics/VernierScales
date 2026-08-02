@@ -37,7 +37,9 @@
       "retrograde": "Rétrograde",
       "extended": "Étendu"
     },
-    "labelPattern": "{{label}} : {{value}}"
+    "labelPattern": "{{label}} : {{value}}",
+    "rawReading": "L'échelle indique",
+    "correctedReading": "Corrigée"
   },
   "principle": {
     "geometry": "Géométrie du vernier",
@@ -61,8 +63,6 @@
     },
     "zeroError": "Erreur de zéro",
     "snapToReadable": "Aligner sur les valeurs lisibles",
-    "rawReading": "L'échelle indique",
-    "correctedReading": "Corrigée",
     "zeroErrorHint": "Un pied à coulisse qui n'indique pas zéro une fois fermé fausse toutes les longueurs de la même quantité."
   },
   "instruments": {
@@ -93,7 +93,7 @@
     "revealPattern": "La lecture est {{reading}}.",
     "tallyPattern": "{{correct}} bonnes réponses sur {{asked}}",
     "fractionHint": "Écrivez les fractions ainsi : 1 37/128.",
-    "zeroErrorPrompt": "Corrigez l'erreur de zéro, puis saisissez la mesure vraie."
+    "zeroErrorPrompt": "Erreur de zéro : {{value}}. Corrigez-la, puis saisissez la mesure vraie."
   },
   "a11y": {
     "principle": {
@@ -165,7 +165,9 @@
   },
   "preferences": {
     "title": "Simulation",
-    "startMagnified": "Afficher la vue agrandie au démarrage"
+    "startMagnified": "Afficher la vue agrandie au démarrage",
+    "showTrueValue": "Afficher la valeur réelle",
+    "showCoincidenceMarker": "Marquer la ligne coïncidente"
   },
   "keyboardHelp": {
     "title": "Déplacer le vernier",

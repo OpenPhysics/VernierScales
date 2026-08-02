@@ -29,9 +29,6 @@ export class VernierPrincipleModel implements TModel {
   /** How many divisions the vernier has — the `n` that sets the least count. */
   public readonly divisionsProperty = new NumberProperty(INITIAL_DIVISIONS);
 
-  /** Whether to draw the guide line marking the coincidence. */
-  public readonly showConvergenceProperty = new Property(true);
-
   /** The scale being read. Its spec is rebuilt whenever the choices above change. */
   public readonly scale: VernierScaleModel;
 
@@ -68,7 +65,6 @@ export class VernierPrincipleModel implements TModel {
     // reset have the last word on the measurement.
     this.vernierTypeProperty.reset();
     this.divisionsProperty.reset();
-    this.showConvergenceProperty.reset();
     this.scale.reset();
     this.scale.specProperty.value = createPrincipleSpec(VernierType.DIRECT, INITIAL_DIVISIONS);
   }

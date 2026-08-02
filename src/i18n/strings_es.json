@@ -37,7 +37,9 @@
       "retrograde": "Retrógrado",
       "extended": "Extendido"
     },
-    "labelPattern": "{{label}}: {{value}}"
+    "labelPattern": "{{label}}: {{value}}",
+    "rawReading": "La escala indica",
+    "correctedReading": "Corregida"
   },
   "principle": {
     "geometry": "Geometría del nonio",
@@ -61,8 +63,6 @@
     },
     "zeroError": "Error de cero",
     "snapToReadable": "Ajustar a valores legibles",
-    "rawReading": "La escala indica",
-    "correctedReading": "Corregida",
     "zeroErrorHint": "Un calibrador que no marca cero al cerrarse falsea todas las longitudes en la misma cantidad."
   },
   "instruments": {
@@ -93,7 +93,7 @@
     "revealPattern": "La lectura es {{reading}}.",
     "tallyPattern": "{{correct}} correctas de {{asked}}",
     "fractionHint": "Escribe las fracciones así: 1 37/128.",
-    "zeroErrorPrompt": "Corrige el error de cero y escribe la medida verdadera."
+    "zeroErrorPrompt": "Error de cero: {{value}}. Corrígelo y escribe la medida verdadera."
   },
   "a11y": {
     "principle": {
@@ -165,7 +165,9 @@
   },
   "preferences": {
     "title": "Simulación",
-    "startMagnified": "Mostrar la vista ampliada al iniciar"
+    "startMagnified": "Mostrar la vista ampliada al iniciar",
+    "showTrueValue": "Mostrar el valor real",
+    "showCoincidenceMarker": "Marcar la línea coincidente"
   },
   "keyboardHelp": {
     "title": "Mover el nonio",

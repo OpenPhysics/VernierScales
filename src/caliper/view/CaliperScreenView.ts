@@ -81,7 +81,7 @@ export class CaliperScreenView extends ScreenView {
 
     // ── Reading ───────────────────────────────────────────────────────────────
     const readout = new ReadingReadoutNode(model.scale, {
-      showTrueValueProperty: model.showTrueValueProperty,
+      showTrueValueProperty: preferences.showTrueValueProperty,
       left: SCREEN_VIEW_MARGIN,
       top: scaleViews.bottom + 16,
     });
@@ -149,7 +149,7 @@ export class CaliperScreenView extends ScreenView {
     });
 
     const showTrueValueCheckbox = new Checkbox(
-      model.showTrueValueProperty,
+      preferences.showTrueValueProperty,
       panelLabel(common.showTrueValueStringProperty),
       {
         accessibleName: a11y.controls.showTrueValueStringProperty,

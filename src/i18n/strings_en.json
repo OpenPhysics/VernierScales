@@ -37,7 +37,9 @@
       "retrograde": "Retrograde",
       "extended": "Extended"
     },
-    "labelPattern": "{{label}}: {{value}}"
+    "labelPattern": "{{label}}: {{value}}",
+    "rawReading": "Scale reads",
+    "correctedReading": "Corrected"
   },
   "principle": {
     "geometry": "Vernier geometry",
@@ -61,8 +63,6 @@
     },
     "zeroError": "Zero error",
     "snapToReadable": "Snap to readable values",
-    "rawReading": "Scale reads",
-    "correctedReading": "Corrected",
     "zeroErrorHint": "A caliper that does not read zero when closed reports every length wrong by the same amount."
   },
   "instruments": {
@@ -93,7 +93,7 @@
     "revealPattern": "The reading is {{reading}}.",
     "tallyPattern": "{{correct}} correct of {{asked}}",
     "fractionHint": "Write fractions like 1 37/128.",
-    "zeroErrorPrompt": "Correct for the zero error, then type the true measurement."
+    "zeroErrorPrompt": "Zero error: {{value}}. Correct for it, then type the true measurement."
   },
   "a11y": {
     "principle": {
@@ -165,7 +165,9 @@
   },
   "preferences": {
     "title": "Simulation",
-    "startMagnified": "Start with the magnified view shown"
+    "startMagnified": "Start with the magnified view shown",
+    "showTrueValue": "Show the true value",
+    "showCoincidenceMarker": "Mark the coincident line"
   },
   "keyboardHelp": {
     "title": "Move the Vernier",

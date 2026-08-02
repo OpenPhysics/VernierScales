@@ -27,24 +27,40 @@ export class VernierScalesPreferencesNode extends VBox {
       fill: VernierScalesColors.controlSurfaceTextColorProperty,
     });
 
+    const labelOptions = {
+      font: new PhetFont(14),
+      fill: VernierScalesColors.controlSurfaceTextColorProperty,
+    } as const;
+
+    const checkboxOptions = (name: string) => ({
+      checkboxColor: VernierScalesColors.controlSurfaceTextColorProperty,
+      checkboxColorBackground: VernierScalesColors.controlSurfaceColorProperty,
+      spacing: 8,
+      ...(tandem && { tandem: tandem.createTandem(name) }),
+    });
+
     const startMagnifiedCheckbox = new Checkbox(
       preferencesModel.startMagnifiedProperty,
-      new Text(prefStrings.startMagnifiedStringProperty, {
-        font: new PhetFont(14),
-        fill: VernierScalesColors.controlSurfaceTextColorProperty,
-      }),
-      {
-        checkboxColor: VernierScalesColors.controlSurfaceTextColorProperty,
-        checkboxColorBackground: VernierScalesColors.controlSurfaceColorProperty,
-        spacing: 8,
-        ...(tandem && { tandem: tandem.createTandem("startMagnifiedCheckbox") }),
-      },
+      new Text(prefStrings.startMagnifiedStringProperty, labelOptions),
+      checkboxOptions("startMagnifiedCheckbox"),
+    );
+
+    const showTrueValueCheckbox = new Checkbox(
+      preferencesModel.showTrueValueProperty,
+      new Text(prefStrings.showTrueValueStringProperty, labelOptions),
+      checkboxOptions("showTrueValueCheckbox"),
+    );
+
+    const showCoincidenceMarkerCheckbox = new Checkbox(
+      preferencesModel.showCoincidenceMarkerProperty,
+      new Text(prefStrings.showCoincidenceMarkerStringProperty, labelOptions),
+      checkboxOptions("showCoincidenceMarkerCheckbox"),
     );
 
     super({
       align: "left",
       spacing: 12,
-      children: [header, startMagnifiedCheckbox],
+      children: [header, startMagnifiedCheckbox, showTrueValueCheckbox, showCoincidenceMarkerCheckbox],
     });
   }
 }

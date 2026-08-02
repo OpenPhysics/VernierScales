@@ -46,9 +46,6 @@ export class InstrumentsModel implements TModel {
   /** The bevel protractor's circular scale. */
   public readonly protractor = new VernierScaleModel(PROTRACTOR_FIVE_MINUTE, INITIAL_PROTRACTOR_DEG);
 
-  /** Whether to reveal the true value alongside the reading. */
-  public readonly showTrueValueProperty = new Property(false);
-
   /** The scale belonging to whichever instrument is on show. */
   public get activeScale(): VernierScaleModel {
     return this.instrumentProperty.value === Instrument.MICROMETER ? this.micrometer : this.protractor;
@@ -56,7 +53,6 @@ export class InstrumentsModel implements TModel {
 
   public reset(): void {
     this.instrumentProperty.reset();
-    this.showTrueValueProperty.reset();
     this.micrometer.reset();
     this.protractor.reset();
   }

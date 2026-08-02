@@ -64,7 +64,7 @@ export class InstrumentsScreenView extends ScreenView {
     // ── The instruments ───────────────────────────────────────────────────────
     const micrometerNode = new MicrometerNode(model.micrometer, {
       x: 150,
-      y: 128,
+      y: 110,
       visibleProperty: showingMicrometerProperty,
     });
     this.addChild(micrometerNode);
@@ -85,7 +85,7 @@ export class InstrumentsScreenView extends ScreenView {
       dragAccessibleName: a11y.controls.scaleStringProperty,
       dragAccessibleHelpText: a11y.controls.scaleHelpStringProperty,
       left: SCREEN_VIEW_MARGIN,
-      top: 226,
+      top: 236,
       visibleProperty: showingMicrometerProperty,
     });
     this.addChild(micrometerScales);
@@ -96,14 +96,14 @@ export class InstrumentsScreenView extends ScreenView {
       dragAccessibleName: a11y.controls.scaleStringProperty,
       dragAccessibleHelpText: a11y.controls.scaleHelpStringProperty,
       left: SCREEN_VIEW_MARGIN,
-      top: 226,
+      top: 236,
       visibleProperty: showingProtractorProperty,
     });
     this.addChild(protractorScales);
 
     // ── Readouts ──────────────────────────────────────────────────────────────
     const micrometerReadout = new ReadingReadoutNode(model.micrometer, {
-      showTrueValueProperty: model.showTrueValueProperty,
+      showTrueValueProperty: preferences.showTrueValueProperty,
       left: SCREEN_VIEW_MARGIN,
       top: micrometerScales.bottom + 14,
       visibleProperty: showingMicrometerProperty,
@@ -111,7 +111,7 @@ export class InstrumentsScreenView extends ScreenView {
     this.addChild(micrometerReadout);
 
     const protractorReadout = new ReadingReadoutNode(model.protractor, {
-      showTrueValueProperty: model.showTrueValueProperty,
+      showTrueValueProperty: preferences.showTrueValueProperty,
       left: SCREEN_VIEW_MARGIN,
       top: protractorScales.bottom + 14,
       visibleProperty: showingProtractorProperty,
@@ -152,7 +152,7 @@ export class InstrumentsScreenView extends ScreenView {
     });
 
     const showTrueValueCheckbox = new Checkbox(
-      model.showTrueValueProperty,
+      preferences.showTrueValueProperty,
       panelLabel(common.showTrueValueStringProperty),
       {
         accessibleName: a11y.controls.showTrueValueStringProperty,

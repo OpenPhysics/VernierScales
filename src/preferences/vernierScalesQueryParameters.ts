@@ -29,6 +29,28 @@ const vernierScalesQueryParameters = QueryStringMachine.getAll({
     defaultValue: true,
     public: true,
   },
+
+  /**
+   * Whether the true, unquantised value is shown alongside the reading, exposing
+   * the ±½ least count that is the instrument's resolution. Applies to the
+   * Caliper and Instruments screens, where a continuous "true" size exists.
+   */
+  showTrueValue: {
+    type: "boolean",
+    defaultValue: false,
+    public: true,
+  },
+
+  /**
+   * Whether the full-height guide line marking the coincident tick is drawn.
+   * Currently the Vernier Principle screen is the only place it appears, but it
+   * is a display default rather than a per-screen behaviour, so it lives here.
+   */
+  showCoincidenceMarker: {
+    type: "boolean",
+    defaultValue: true,
+    public: true,
+  },
 });
 
 VernierScalesNamespace.register("vernierScalesQueryParameters", vernierScalesQueryParameters);

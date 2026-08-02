@@ -66,7 +66,7 @@ export class VernierPrincipleScreenView extends ScreenView {
       magnifiedVisibleProperty: preferences.startMagnifiedProperty,
       dragAccessibleName: a11y.controls.vernierStringProperty,
       dragAccessibleHelpText: a11y.controls.vernierHelpStringProperty,
-      coincidenceMarkerVisibleProperty: model.showConvergenceProperty,
+      coincidenceMarkerVisibleProperty: preferences.showCoincidenceMarkerProperty,
       left: SCREEN_VIEW_MARGIN,
       top: 70,
     });
@@ -167,7 +167,7 @@ export class VernierPrincipleScreenView extends ScreenView {
 
     // ── Coincidence marker toggle ─────────────────────────────────────────────
     const showCoincidenceCheckbox = new Checkbox(
-      model.showConvergenceProperty,
+      preferences.showCoincidenceMarkerProperty,
       panelLabel(strings.showCoincidenceStringProperty),
       {
         accessibleName: a11y.controls.showCoincidenceStringProperty,
