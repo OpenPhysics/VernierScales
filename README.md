@@ -1,5 +1,7 @@
 # Vernier Scales
 
+[![CI](https://github.com/OpenPhysics/VernierScales/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenPhysics/VernierScales/actions/workflows/ci.yml)
+
 An interactive simulation about reading vernier calipers — and about the vernier principle in
 general — built with [SceneryStack](https://scenerystack.org/), Vite 8, TypeScript 7, and Biome 2.
 
