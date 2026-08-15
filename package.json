@@ -18,7 +18,8 @@
     "micrometer",
     "measurement",
     "scenerystack",
-    "education"
+    "education",
+    "pwa"
   ],
   "scripts": {
     "start": "vite",
