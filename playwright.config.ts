@@ -1,5 +1,5 @@
 /**
- * Playwright configuration for optional fuzz testing (Template smoke).
+ * Playwright configuration for optional fuzz testing (VernierScales smoke).
  */
 
 import { defineConfig } from "@playwright/test";
