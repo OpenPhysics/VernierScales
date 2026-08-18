@@ -153,7 +153,7 @@ export class InstrumentsScreenView extends ScreenView {
       {
         accessibleName: a11y.controls.showTrueValueStringProperty,
         checkboxColor: VernierScalesColors.textColorProperty,
-        checkboxColorBackground: VernierScalesColors.controlSurfaceColorProperty,
+        checkboxColorBackground: VernierScalesColors.panelBackgroundColorProperty,
         spacing: 8,
       },
     );

@@ -196,7 +196,7 @@ export class VernierPrincipleScreenView extends ScreenView {
       {
         accessibleName: a11y.controls.showCoincidenceStringProperty,
         checkboxColor: VernierScalesColors.textColorProperty,
-        checkboxColorBackground: VernierScalesColors.controlSurfaceColorProperty,
+        checkboxColorBackground: VernierScalesColors.panelBackgroundColorProperty,
         spacing: 8,
       },
     );

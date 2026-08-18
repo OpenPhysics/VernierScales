@@ -150,7 +150,7 @@ export class CaliperScreenView extends ScreenView {
       {
         accessibleName: a11y.controls.showTrueValueStringProperty,
         checkboxColor: VernierScalesColors.textColorProperty,
-        checkboxColorBackground: VernierScalesColors.controlSurfaceColorProperty,
+        checkboxColorBackground: VernierScalesColors.panelBackgroundColorProperty,
         spacing: 8,
       },
     );
@@ -158,7 +158,7 @@ export class CaliperScreenView extends ScreenView {
     const snapCheckbox = new Checkbox(model.snapToReadableProperty, panelLabel(strings.snapToReadableStringProperty), {
       accessibleName: a11y.controls.snapToReadableStringProperty,
       checkboxColor: VernierScalesColors.textColorProperty,
-      checkboxColorBackground: VernierScalesColors.controlSurfaceColorProperty,
+      checkboxColorBackground: VernierScalesColors.panelBackgroundColorProperty,
       spacing: 8,
     });
 
