@@ -102,7 +102,7 @@ non-visual user cannot otherwise get — plus explicit `pdomOrder` and keyboard 
 (shared `VernierKeyboardHelpSection` for vernier motion). The Practice answer field
 is a real PDOM `<input>` mirrored into a Property (`AnswerFieldNode`).
 
-Full checklist: [Baton/ACCESSIBILITY.md](https://github.com/OpenPhysics/Baton/blob/main/ACCESSIBILITY.md).
+Full checklist: [Baton/ACCESSIBILITY.md](https://github.com/OpenLyceum/Baton/blob/main/ACCESSIBILITY.md).
 
 ## Testing
 

@@ -21,7 +21,7 @@ const ARCMINUTES_PER_DEGREE = 60;
 /**
  * The unit symbol for a scale. Not localized: `mm`, `in` and `°` are the SI and
  * conventional symbols and are left untranslated by design, matching how the
- * rest of the OpenPhysics fleet renders units.
+ * rest of the OpenLyceum fleet renders units.
  */
 export const unitSymbol = (spec: VernierScaleSpec): string => {
   switch (spec.quantity) {
